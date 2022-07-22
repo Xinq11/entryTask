@@ -13,7 +13,7 @@
 _给出整体系统架构图，或者与当前方案相关的部分架构图，包括主要模块、数据流、上下文关系。_<br />_如果是部分变动，应使用文字描述或者图形标识突出有变化的地方。_<br />_使用表格或者子章节的形式，描述主要模块和接口的功能；_
 <a name="vvESq"></a>
 ### 系统架构图
-![](https://cdn.nlark.com/yuque/0/2022/jpeg/21719644/1658470040023-de40819d-5d6a-4ec6-ab0e-bdb1c83f1099.jpeg)<br />加UI层<br />加登出功能
+![](https://cdn.nlark.com/yuque/0/2022/jpeg/21719644/1658470040023-de40819d-5d6a-4ec6-ab0e-bdb1c83f1099.jpeg)
 <a name="ORSG3"></a>
 ### 页面转换
 ![](https://cdn.nlark.com/yuque/0/2022/jpeg/21719644/1658470042186-4ddec177-e2c3-4c2e-bbba-5849662dd96e.jpeg)
