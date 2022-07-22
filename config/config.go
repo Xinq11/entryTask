@@ -9,7 +9,7 @@ const (
 	// redis配置参数
 	RedisAddr     = "127.0.0.1:6379"
 	RedisPassword = "123456"
-	RedisPoolNum  = 30
+	RedisPoolNum  = 50
 
 	// 图片保存配置参数
 

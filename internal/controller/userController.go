@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"regexp"
 	"strings"
@@ -136,6 +137,7 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		SessionID: c.Value,
 	}
 	rpcResponse := client.Client.Call("UserService.GetUserInfo", userDTO)
+	logrus.Infoln("controller receive rpc res: ", rpcResponse)
 	// 处理结果
 	res := entity.HttpResponse{
 		Err_code: rpcResponse.Err_code,

@@ -13,6 +13,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 	"math/rand"
+	_ "net/http/pprof"
 	"time"
 )
 
