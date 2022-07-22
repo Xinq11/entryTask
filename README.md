@@ -1,5 +1,3 @@
-## 一、背景及目的
-<a name="ibxlh"></a>
 ## **一、背景及目的**
 - 让团队更好地了解新人对技能的掌握情况
 - 熟悉简单的Web API后台架构
@@ -274,9 +272,7 @@ _可包括：_<br />_1、配置初始化、更改、下发、推送等；_<br />
 <a name="l1avW"></a>
 ## **八、SLA**
 _可包括：_<br />_1、可支持的存储容量；_<br />_2、关键接口可支撑的TPS、QPS、时延等；_<br />_3、系统可用性保证，如故障时间、恢复时间、Crash率等；_
-
-不用全部压测， 压测登录或者查看用户信息界面接口_go-wrk -t=8 -c=100 -n=200 -H = "sessionID=470157e3-2109-4f93-b534-2a9867cb9b90" "[http://localhost:9090/api/entrytask/user/get_user_info](http://localhost:9090/api/entrytask/user/get_user_info)"<br />�go-torch -u "[http://localhost:9090/api/entrytask/user/get_user_info](http://localhost:9090/api/entrytask/user/get_user_info)" -t 30
-
+不用全部压测， 压测登录或者查看用户信息界面接口
 <a name="tmhcV"></a>
 ## **九、遗留问题与风险预估**
 _可包括：_<br />_1、本次方案受限于时间、人力、外部因素等原因，未充分设计或者实现，可能带来的影响，以及下阶段的改进计划。_<br />_2、受限于外部依赖限制、硬件资源、网络等不可控条件，存在的运行和运营风险。_<br />_<br />
