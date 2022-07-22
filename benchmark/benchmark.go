@@ -75,7 +75,7 @@ func benchmarkBasicN(serverAddr string, n, c int32, isRan bool, ishttpPostMethod
 			//设置http请求的cookie
 			//req.AddCookie(&http.Cookie{Name: "username", Value: username, Expires: time.Now().Add(120 * time.Second)})
 			//req.AddCookie(&http.Cookie{Name: "token", Value: "test", Expires: time.Now().Add(120 * time.Second)})
-			req.AddCookie(&http.Cookie{Name: "sessionID", Value: "49128b98-9cfc-40aa-98da-ccf9b32bc07e", Expires: time.Now().Add(120 * time.Second)})
+			req.AddCookie(&http.Cookie{Name: "sessionID", Value: "4041de50-1510-4990-bda8-d5ac8d0a8ddb", Expires: time.Now().Add(120 * time.Second)})
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value") // This makes it work
 			if err != nil {
 				log.Println(err)

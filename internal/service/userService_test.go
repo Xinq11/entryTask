@@ -13,10 +13,8 @@ func TestUserService_SignUp(t *testing.T) {
 	database.MysqlInit()
 	database.RedisInit()
 	param := entity.UserDTO{
-		Username:    "ll",
-		Password:    "1234567",
-		Nickname:    "curry",
-		ProfilePath: "xxccccc.jpg",
+		Username: "ll",
+		Password: "1234567",
 	}
 	res := userService.SignUp(param)
 	if res.Err_code != constant.Success {
