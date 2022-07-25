@@ -2,7 +2,7 @@ package service
 
 import (
 	"EntryTask/constant"
-	"EntryTask/rpc/RpcEntity"
+	"EntryTask/rpc/rpcEntity"
 	"reflect"
 )
 
@@ -27,14 +27,14 @@ func MakeService(svcStruct interface{}) *RPCService {
 }
 
 // 反射调用本地方法
-func (svc *RPCService) RpcHandler(methodName string, req RpcEntity.RpcRequest) RpcEntity.RpcResponse {
+func (svc *RPCService) RpcHandler(methodName string, req rpcEntity.RpcRequest) rpcEntity.RpcResponse {
 	if method, ok := svc.methodMap[methodName]; ok {
 		function := method.Func
 		res := function.Call([]reflect.Value{svc.svcValue, reflect.ValueOf(req.Args)})
-		return res[0].Interface().(RpcEntity.RpcResponse)
+		return res[0].Interface().(rpcEntity.RpcResponse)
 	} else {
-		reply := RpcEntity.RpcResponse{
-			Err_code: constant.ServerError,
+		reply := rpcEntity.RpcResponse{
+			ErrCode: constant.ServerError,
 		}
 		return reply
 	}

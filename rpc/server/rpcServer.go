@@ -2,9 +2,9 @@ package server
 
 import (
 	"EntryTask/constant"
-	"EntryTask/rpc/RpcEntity"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
+	"EntryTask/rpc/rpcEntity"
 	"EntryTask/rpc/service"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -58,11 +58,11 @@ func (server RpcServer) Accept(addr string) {
 				methodName := req.MethodName[index+1:]
 				svc, ok := server.serviceMap[serviceName]
 				server.mu.Unlock()
-				res := RpcEntity.RpcResponse{}
+				res := rpcEntity.RpcResponse{}
 				// 调用处理函数
 				if !ok {
 					logrus.Error("rpcServer.Accept error: ", err.Error())
-					res.Err_code = constant.ServerError
+					res.ErrCode = constant.ServerError
 				} else {
 					res = svc.RpcHandler(methodName, req)
 				}

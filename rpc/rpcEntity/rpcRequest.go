@@ -1,4 +1,4 @@
-package RpcEntity
+package rpcEntity
 
 type RpcRequest struct {
 	MethodName string

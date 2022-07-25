@@ -1,9 +1,9 @@
 package client
 
 import (
-	"EntryTask/rpc/RpcEntity"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
+	"EntryTask/rpc/rpcEntity"
 	"github.com/sirupsen/logrus"
 	"net"
 )
@@ -15,8 +15,8 @@ type RpcClient struct {
 var Client RpcClient
 
 func MakeClient(addr string) error {
-	connPool := make(chan net.Conn, 3000)
-	for i := 0; i < 3000; i++ {
+	connPool := make(chan net.Conn, 2000)
+	for i := 0; i < 2000; i++ {
 		conn, err := net.Dial("tcp", addr)
 		if err != nil {
 			logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
@@ -45,10 +45,10 @@ func (client RpcClient) releaseConn(conn net.Conn) {
 	}
 }
 
-func (client RpcClient) Call(methodName string, args interface{}) RpcEntity.RpcResponse {
+func (client RpcClient) Call(methodName string, args interface{}) rpcEntity.RpcResponse {
 	conn := client.getConn()
 	defer client.releaseConn(conn)
-	request := RpcEntity.RpcRequest{
+	request := rpcEntity.RpcRequest{
 		MethodName: methodName,
 		Args:       args,
 	}

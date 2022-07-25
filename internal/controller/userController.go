@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"io"
+	"io/ioutil"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -17,15 +18,21 @@ import (
 
 // 注册
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	//w.Header().Set("Content-Type", "application/json")
+	setHttpHeader(w)
 	// 参数校验
-	username := r.PostFormValue("username")
-	password := r.PostFormValue("password")
-	if len(username) == 0 || len(username) > 8 || !VerifyPassword(password) {
+	/*
+		username := r.PostFormValue("username")
+		password := r.PostFormValue("password")
+	*/
+	var req entity.HttpRequest
+	body, err := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &req)
+	if err != nil || len(req.Username) == 0 || len(req.Username) > 8 || !VerifyPassword(req.Password) {
 		res := entity.HttpResponse{
-			Err_code: constant.InvalidParamsError,
-			Err_msg:  constant.InvalidParamsError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.InvalidParamsError,
+			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -33,15 +40,15 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// RPC
 	userDTO := entity.UserDTO{
-		Username: username,
-		Password: password,
+		Username: req.Username,
+		Password: req.Password,
 	}
 	rpcResponse := client.Client.Call("UserService.SignUp", userDTO)
 	// 处理结果
 	res := entity.HttpResponse{
-		Err_code: rpcResponse.Err_code,
-		Err_msg:  rpcResponse.Err_code.GetErrMsgByCode(),
-		Data:     "",
+		ErrCode: rpcResponse.ErrCode,
+		ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
+		Data:    "",
 	}
 	js, _ := json.Marshal(res)
 	w.Write(js)
@@ -49,15 +56,21 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 // 登录
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	// 参数校验
-	username := r.PostFormValue("username")
-	password := r.PostFormValue("password")
-	if len(username) == 0 || len(username) > 8 || !VerifyPassword(password) {
+	//username := r.PostFormValue("username")
+	//password := r.PostFormValue("password")
+	setHttpHeader(w)
+	var req entity.HttpRequest
+	body, err := ioutil.ReadAll(r.Body)
+	logrus.Infoln(body)
+	err = json.Unmarshal(body, &req)
+	logrus.Infoln("controller receive param: ", req.Username, req.Password)
+	if err != nil || len(req.Username) == 0 || len(req.Username) > 8 || !VerifyPassword(req.Password) {
 		res := entity.HttpResponse{
-			Err_code: constant.InvalidParamsError,
-			Err_msg:  constant.InvalidParamsError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.InvalidParamsError,
+			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -65,23 +78,29 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// RPC
 	userDTO := entity.UserDTO{
-		Username: username,
-		Password: password,
+		Username: req.Username,
+		Password: req.Password,
 	}
+
 	rpcResponse := client.Client.Call("UserService.SignIn", userDTO)
+	logrus.Infoln("controller receive rpc res: ", rpcResponse)
+	var sessionID string
 	// 处理结果
-	if rpcResponse.Err_code == constant.Success {
+	if rpcResponse.ErrCode == constant.Success {
 		dto := rpcResponse.Data.(entity.UserDTO)
 		cookie := http.Cookie{
-			Name:  "sessionID",
-			Value: dto.SessionID,
+			Name:     "sessionID",
+			Value:    dto.SessionID,
+			Secure:   false,
+			HttpOnly: false,
 		}
 		http.SetCookie(w, &cookie)
+		sessionID = dto.SessionID
 	}
 	res := entity.HttpResponse{
-		Err_code: rpcResponse.Err_code,
-		Err_msg:  rpcResponse.Err_code.GetErrMsgByCode(),
-		Data:     "",
+		ErrCode: rpcResponse.ErrCode,
+		ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
+		Data:    sessionID,
 	}
 	js, _ := json.Marshal(res)
 	w.Write(js)
@@ -89,14 +108,14 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 // 登出
 func SignOutHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	setHttpHeader(w)
 	// 参数校验
 	c, err := r.Cookie("sessionID")
 	if err != nil || c == nil {
 		res := entity.HttpResponse{
-			Err_code: constant.InvalidSessionError,
-			Err_msg:  constant.InvalidSessionError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.InvalidSessionError,
+			ErrMsg:  constant.InvalidSessionError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -109,9 +128,9 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 	rpcResponse := client.Client.Call("UserService.SignOut", userDTO)
 	// 处理结果
 	res := entity.HttpResponse{
-		Err_code: rpcResponse.Err_code,
-		Err_msg:  rpcResponse.Err_code.GetErrMsgByCode(),
-		Data:     "",
+		ErrCode: rpcResponse.ErrCode,
+		ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
+		Data:    "",
 	}
 	js, _ := json.Marshal(res)
 	w.Write(js)
@@ -119,14 +138,16 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 
 // 获取用户信息
 func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
+	setHttpHeader(w)
 	// 参数校验
 	c, err := r.Cookie("sessionID")
 	if err != nil || c == nil {
+		logrus.Infoln(err.Error())
 		res := entity.HttpResponse{
-			Err_code: constant.InvalidSessionError,
-			Err_msg:  constant.InvalidSessionError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.InvalidSessionError,
+			ErrMsg:  constant.InvalidSessionError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -140,10 +161,10 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Infoln("controller receive rpc res: ", rpcResponse)
 	// 处理结果
 	res := entity.HttpResponse{
-		Err_code: rpcResponse.Err_code,
-		Err_msg:  rpcResponse.Err_code.GetErrMsgByCode(),
+		ErrCode: rpcResponse.ErrCode,
+		ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
 	}
-	if rpcResponse.Err_code == constant.Success {
+	if rpcResponse.ErrCode == constant.Success {
 		dto := rpcResponse.Data.(entity.UserDTO)
 		res.Data = entity.UserVO{
 			Username:    dto.Username,
@@ -159,15 +180,15 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 // 更新头像
 func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	setHttpHeader(w)
 	// 参数校验
 	c, err := r.Cookie("sessionID")
 	username := r.PostFormValue("username")
 	if err != nil || c == nil || len(username) == 0 || len(username) > 8 {
 		res := entity.HttpResponse{
-			Err_code: constant.InvalidParamsError,
-			Err_msg:  constant.InvalidParamsError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.InvalidParamsError,
+			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -178,9 +199,9 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logrus.Error("userController.SignUpHandler saveProfilePic error: ", err.Error())
 		res := entity.HttpResponse{
-			Err_code: constant.ServerError,
-			Err_msg:  constant.ServerError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.ServerError,
+			ErrMsg:  constant.ServerError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -194,10 +215,10 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 	rpcResponse := client.Client.Call("UserService.UpdateProfilePic", userDTO)
 	// 处理结果
 	res := entity.HttpResponse{
-		Err_code: rpcResponse.Err_code,
-		Err_msg:  rpcResponse.Err_code.GetErrMsgByCode(),
+		ErrCode: rpcResponse.ErrCode,
+		ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
 	}
-	if rpcResponse.Err_code == constant.Success {
+	if rpcResponse.ErrCode == constant.Success {
 		res.Data = entity.UserVO{
 			ProfilePath: filePath,
 		}
@@ -210,15 +231,18 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 
 // 更新昵称
 func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	setHttpHeader(w)
 	// 参数校验
 	c, err := r.Cookie("sessionID")
-	nickname := r.PostFormValue("nickname")
-	if err != nil || c == nil || len(nickname) == 0 || len(nickname) > 16 {
+	// nickname := r.PostFormValue("nickname")
+	var req entity.HttpRequest
+	body, err := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &req)
+	if err != nil || c == nil || len(req.Nickname) == 0 || len(req.Nickname) > 16 {
 		res := entity.HttpResponse{
-			Err_code: constant.InvalidParamsError,
-			Err_msg:  constant.InvalidParamsError.GetErrMsgByCode(),
-			Data:     "",
+			ErrCode: constant.InvalidParamsError,
+			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
+			Data:    "",
 		}
 		js, _ := json.Marshal(res)
 		w.Write(js)
@@ -227,17 +251,29 @@ func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
 	// RPC
 	userDTO := entity.UserDTO{
 		SessionID: c.Value,
-		Nickname:  nickname,
+		Nickname:  req.Nickname,
 	}
 	rpcResponse := client.Client.Call("UserService.UpdateNickName", userDTO)
 	// 处理结果
 	res := entity.HttpResponse{
-		Err_code: rpcResponse.Err_code,
-		Err_msg:  rpcResponse.Err_code.GetErrMsgByCode(),
-		Data:     "",
+		ErrCode: rpcResponse.ErrCode,
+		ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
+	}
+	if rpcResponse.ErrCode == constant.Success {
+		res.Data = entity.UserVO{
+			Nickname: req.Nickname,
+		}
+	} else {
+		res.Data = ""
 	}
 	js, _ := json.Marshal(res)
 	w.Write(js)
+}
+
+func setHttpHeader(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:63342")
 }
 
 // 图片处理
@@ -265,7 +301,7 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 // 校验密码 不合规返回false
 func VerifyPassword(password string) bool {
 	// 正则
-	myRegex := regexp.MustCompile("^[a-zA-Z][0-9]{7,16}$")
+	myRegex := regexp.MustCompile("^([a-zA-Z]*[0-9]*){7,16}$")
 	res := myRegex.MatchString(password)
 	return res
 }

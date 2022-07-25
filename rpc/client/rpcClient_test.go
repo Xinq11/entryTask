@@ -2,7 +2,7 @@ package client
 
 import (
 	"EntryTask/internal/entity"
-	"EntryTask/rpc/RpcEntity"
+	"EntryTask/rpc/rpcEntity"
 	"EntryTask/rpc/server"
 	"sync"
 
@@ -15,11 +15,11 @@ type test struct {
 	res int
 }
 
-func (t test) Add(a entity.UserDTO) RpcEntity.RpcResponse {
+func (t test) Add(a entity.UserDTO) rpcEntity.RpcResponse {
 
-	return RpcEntity.RpcResponse{
-		Err_code: 0,
-		Data:     a.Username,
+	return rpcEntity.RpcResponse{
+		ErrCode: 0,
+		Data:    a.Username,
 	}
 }
 
@@ -39,10 +39,10 @@ func TestCall(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		go func() {
 			call := Client.Call("test.Add", entity.UserDTO{Username: "xq"})
-			if call.Err_code == 0 {
+			if call.ErrCode == 0 {
 				t.Log("success", call.Data)
 			} else {
-				t.Error("fail", call.Err_code.GetErrMsgByCode())
+				t.Error("fail", call.ErrCode.GetErrMsgByCode())
 			}
 			wg.Done()
 		}()
