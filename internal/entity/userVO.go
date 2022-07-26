@@ -1,7 +1,7 @@
 package entity
 
 type UserVO struct {
-	Username    string
-	Nickname    string
-	ProfilePath string
+	Username    string `json:"username"`
+	Nickname    string `json:"nickname"`
+	ProfilePath string `json:"profilePath"`
 }

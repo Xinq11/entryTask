@@ -33,7 +33,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 300px;
             background-color: rgba(176, 196, 222, 0.3);
             box-shadow: 7px 7px 17px rgba(52, 56, 66, 0.5);
             border-radius: 5px;
@@ -79,6 +78,15 @@
             width: 100px;
             height: 50px;
             font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wrap {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0 30px 0;
         }
 
     </style>
@@ -92,12 +100,11 @@
 
         <p>password:<input id="password" type="password"><label id="password_trip"></label></p>
 
-        <div style="text-align: left;margin-top: 30px;">
-            <input type="submit" class="button" value="commit", onclick="sendPost()" >
-        </div>
+        <div class="wrap">
 
-        <div style="text-align: right;margin-top: 30px;">
-            <input type="" class="button" value="sign In", onclick="signIn()" >
+            <div class="button"  onclick="sendPost()" >commit</div>
+
+            <div class="button"  onclick="signIn()" >sign in</div>
         </div>
     </form>
 </div>
@@ -108,18 +115,22 @@
             "username": document.getElementById("username").value,
             "password": document.getElementById("password").value
         });
+        console.log(data)
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("POST", "http://localhost:9090/api/entrytask/user/signup");
         xhr.send(data);
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.status == 200) {//验证请求是否发送成功
-                window.location.href="signIn.html";
-
+                let json = JSON.parse(xhr.responseText);
+                if (json.errCode == 6) {
+                    window.location.href="signIn.html";
+                } else{
+                    console.log(json)
+                }
             }
         };
     }
-
     function signIn() {
         window.location.href="signIn.html";
     }

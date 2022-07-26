@@ -17,6 +17,9 @@
             background-repeat: no-repeat;
             background-size: 100% 100%;
             -moz-background-size: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         body {
@@ -24,10 +27,11 @@
             align-items: center;
             justify-content: center;
             height: 100%;
+            width: 70%;
         }
 
         #userInfoDiv {
-            width: 37%;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,43 +42,25 @@
             border-radius: 5px;
         }
 
-        #nickname_trip {
-            margin-left: 50px;
-            color: black;
-            text-align: center;
-            font-size: 30px;
-        }
-        #signOut_trip {
-            margin-left: 10px;
-            color: black;
-            text-align: center;
-            font-size: 10px;
-        }
-
-        p {
-            margin-top: 30px;
-            margin-left: 100px;
+        .info {
             color: black;
             font-size: 25px;
+            margin-top: 30px;
         }
 
         img {
-            margin-top: 30px;
-            margin-left: 100px;
             color: black;
             font-size: 25px;
         }
 
         input {
-            margin-left: 10px;
+            height: 30px;
+            width: 200px;
             border-radius: 5px;
             border-style: hidden;
-            height: 50px;
-            width: 300px;
             background-color: rgba(255, 255, 255, 0.5);
             outline: none;
             color: #020202;
-            padding-left: 5px;
             font-size: 15px;
         }
 
@@ -84,80 +70,95 @@
             color: #000000;
             border-style: hidden;
             border-radius: 5px;
-            width: 300px;
+            width: 200px;
             height: 50px;
             font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .box {
+            width: 24%;
+            margin: 0 30px 0 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .absolute {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        .text {
+            font-size: 20px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 
 <body>
 <div id="userInfoDiv" >
-    <ul class="uk-margin">
-        <div class="uk-inline">
-            <img class="current-profile" width="200" height="200" alt="" uk-img>
-        </div>
-        <div class="uk-inline">
-            <p id = "username">username: </p>
-        </div>
-        <div class="uk-inline">
-            <p id = "nickname">nickname: </p>
-        </div>
-    </ul>
-
-    <form action="#">
-        <div class="uk-margin">
-            <div class="uk-inline">
-                <p>new nickname:<input id="updateNickname" type="text"><label id="nickname_trip"></label></p>
-            </div>
-        </div>
-        <div style="text-align: center;margin-top: 30px;">
-            <input type="submit" class="button" value="commit", onclick="updateNickName()" >
-        </div>
-    </form>
-
-    <form action="#">
-        <div uk-form-custom="target: true">
-            <div style="text-align: center;margin-top: 30px;">
-                <input id="profile" type="file" accept="image/x-png,image/gif,image/jpeg,image/bmp" >
-            </div>
-        </div>
-        <div style="text-align: center;margin-top: 30px;">
-            <input type="submit" class="button" value="commit", onclick="updateProfile()" >
-        </div>
-    </form>
-
-    <div style="text-align: right;margin-top: 30px;">
-        <input type="button" class="button" value="sign out", onclick="signOut()" >
+    <div class="box">
+        <img class="current-profile" id = "profilePath" width="200" height="200" alt="" uk-img src="">
+        <div class="info"  id = "username">username: </div>
+        <div class="info" id = "nickname">nickname: </div>
     </div>
+
+    <div class="box">
+        <div class="text">上传昵称</div>
+        <input placeholder="nickname" id="updateNickname"/>
+        <div class="button" onclick="updateNickName()">commit</div>
+    </div>
+
+    <div class="box">
+        <div class="text">上传文件</div>
+        <input id="profile" type="file" accept="image/x-png,image/gif,image/jpeg,image/bmp" />
+        <div class="button" onclick="updateProfile()">commit</div>
+    </div>
+
+    <div class="button absolute" onclick="signOut()" >sign out</div>
 
 </div>
 
 <script>
 
-    let sessionID
     let username
     let nickname
     let profilePath
 
-   //window.onload = function getUserInfo() {
-    function getUserInfo() {
+    window.onload = function getUserInfo() {
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
-        xhr.open("GET", "http://localhost:9090/api/entrytask/user/get_user_Info");
+        xhr.open("GET", "http://localhost:9090/api/entrytask/user/get_user_info");
         // 获取cookie
-        sessionID = document.cookie.split('=')[1];
+        let cookieString = document.cookie
+        if (cookieString.search("sessionID") == -1) {
+            window.alert("session过期 请重新登录")
+            window.location.href="signIn.html";
+        }
+        let sessionID = cookieString.split('=')[1];
+        console.log(sessionID)
         console.log("window_onload", sessionID)
         xhr.setRequestHeader("Cookie", sessionID);
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
-                console.log(json)
-                profilePath = json.data.profilePath
-                document.getElementById("username").innerHTML=json.data.Username;
-                document.getElementById("nickname").innerHTML=json.data.Nickname;
-                console.log(username, nickname, profilePath)
+                if (json.errCode == 6) {
+                    console.log(json)
+                    profilePath = json.data.profilePath
+                    username = json.data.username
+                    nickname = json.data.nickname
+                    console.log(username, nickname, profilePath)
+                    profilePath = "http://127.0.0.1:8887/" + profilePath
+                    console.log(username, nickname, profilePath)
+                    document.getElementById("username").innerHTML=username;
+                    document.getElementById("nickname").innerHTML=nickname;
+                    let obj = document.getElementById("profilePath");
+                    obj.src = profilePath
+                } else {
+                    console.log(json)
+                }
 
             }
         };
@@ -166,23 +167,24 @@
     function signOut() {
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
-        xhr.open("POST", "http://localhost:9090/api/entrytask/user/get_user_info");
+        xhr.open("POST", "http://localhost:9090/api/entrytask/user/signout");
         // 获取cookie
-        sessionID = document.cookie.split('=')[1];
-        console.log(sessionID)
+        //sessionID = document.cookie.split('=')[1];
+
+        let cookieString = document.cookie
+        if (cookieString.search("sessionID") == -1) {
+            window.alert("session过期 请重新登录")
+            window.location.href="signIn.html";
+        }
+        let sessionID = cookieString.split('=')[1];
         xhr.setRequestHeader("Cookie", sessionID);
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.status == 200) {//验证请求是否发送成功
-                let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
-                console.log(json)
-                console.log(json)
-                username = json.data.Username
-                nickname = json.data.nickname
-                profilePath = json.data.profilePath
-                document.getElementById("username").innerHTML=json.data.Username;
-                document.getElementById("nickname").innerHTML=json.data.Nickname;
-                console.log(username, nickname, profilePath)
+
+                window.location.href="signIn.html";
+
+
             }
         };
     }
@@ -194,8 +196,13 @@
         let data = JSON.stringify({
             "nickname": document.getElementById("updateNickname").value,
         });
+        let cookieString = document.cookie
+        if (cookieString.search("sessionID") == -1) {
+            window.alert("session过期 请重新登录")
+            window.location.href="signIn.html";
+        }
+        let sessionID = cookieString.split('=')[1];
         xhr.setRequestHeader("Cookie", sessionID);
-
         console.log("nikename", sessionID)
         console.log(data.nickname)
         // 获取cookie
@@ -203,10 +210,14 @@
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
-                console.log(json)
-                // 更新页面上的nickname
-                console.log(data)
-                document.getElementById("nickname").innerHTML=json.data.Nickname;
+                if (json.errCode == 6) {
+                    console.log(json)
+                    // 更新页面上的nickname
+                    console.log(data)
+                    document.getElementById("nickname").innerHTML=json.data.nickname;
+                } else {
+                    console.log(json)
+                }
             }
         };
     }
@@ -215,13 +226,32 @@
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("POST", "http://localhost:9090/api/entrytask/user/update_profile_pic");
-        // 获取cookie
-        xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
-            if (xhr.status == 200) {//验证请求是否发送成功
-                let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
-                console.log(json)
+        let cookieString = document.cookie
+        if (cookieString.search("sessionID") == -1) {
+            window.alert("session过期 请重新登录")
+            window.location.href="signIn.html";
+        }
+        let sessionID = cookieString.split('=')[1];
+        xhr.setRequestHeader("Cookie", sessionID);
+        let data = new FormData();
+        data.append("username", username);
+        data.append("uploadFile", profile.files[0], "default.jpg");
+        xhr.send(data);
+        xhr.addEventListener("readystatechange", function() {
+            if(this.readyState === 4) {
+                console.log(this.responseText);
+                let json = JSON.parse(xhr.responseText);
+                if (json.errCode == 6) {
+                    profilePath = json.data.profilePath
+                    profilePath = "http://127.0.0.1:8887/" + profilePath
+                    let obj = document.getElementById("profilePath");
+                    obj.src = profilePath
+                    console.log("http://127.0.0.1:8887/" + json.data.profilePath)
+                } else {
+                    // tanchuang
+                }
             }
-        };
+        });
     }
 </script>
 

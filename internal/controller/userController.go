@@ -28,7 +28,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	var req entity.HttpRequest
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &req)
-	if err != nil || len(req.Username) == 0 || len(req.Username) > 8 || !VerifyPassword(req.Password) {
+	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || !VerifyPassword(req.Password) {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -66,7 +66,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Infoln(body)
 	err = json.Unmarshal(body, &req)
 	logrus.Infoln("controller receive param: ", req.Username, req.Password)
-	if err != nil || len(req.Username) == 0 || len(req.Username) > 8 || !VerifyPassword(req.Password) {
+	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || !VerifyPassword(req.Password) {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -153,6 +153,7 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	}
+	logrus.Infoln("controller receive params: ", c.Value)
 	// RPC
 	userDTO := entity.UserDTO{
 		SessionID: c.Value,
@@ -184,7 +185,8 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 	// 参数校验
 	c, err := r.Cookie("sessionID")
 	username := r.PostFormValue("username")
-	if err != nil || c == nil || len(username) == 0 || len(username) > 8 {
+	logrus.Infoln("controller receive params: ", c.Value, username)
+	if err != nil || c == nil || len(username) < 4 || len(username) > 13 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -194,6 +196,7 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	}
+
 	// 处理图片
 	filePath, err := saveProfilePic(r, username)
 	if err != nil {
@@ -238,7 +241,8 @@ func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
 	var req entity.HttpRequest
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &req)
-	if err != nil || c == nil || len(req.Nickname) == 0 || len(req.Nickname) > 16 {
+	nickname := []rune(req.Nickname)
+	if err != nil || c == nil || len(nickname) == 0 || len(nickname) > 8 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -285,8 +289,9 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 	}
 	fileName := strings.Split(header.Filename, ".")
 	// 拼接文件名
-	filePath := "img/" + username + "-" + time.Now().Format("2006-01-02-15:04:05") + "." + fileName[len(fileName)-1]
-	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
+	filePath := username + "-" + time.Now().Format("2006-01-02") + "." + fileName[len(fileName)-1]
+	logrus.Infoln("saveProfilePic : ", filePath)
+	f, err := os.OpenFile("img/"+filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	defer f.Close()
 	if err != nil {
 		return "", err

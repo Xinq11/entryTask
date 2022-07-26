@@ -44,8 +44,8 @@ func (u *UserService) SignUp(user entity.UserDTO) rpcEntity.RpcResponse {
 		Salt:        salt,
 		Password:    password,
 		Username:    user.Username,
-		Nickname:    user.Nickname,
-		ProfilePath: user.ProfilePath,
+		Nickname:    "default",
+		ProfilePath: "default-2022-07-26.jpg",
 	}
 	// 存入mysql
 	res, err := mapper.InsertUserInfo(userDO)
@@ -199,8 +199,8 @@ func (u *UserService) UpdateProfilePic(user entity.UserDTO) rpcEntity.RpcRespons
 		}
 	}
 	// 更新mysql
-	res, err := mapper.UpdateProfilePath(user.ProfilePath, username)
-	if res == 0 || err != nil {
+	_, err = mapper.UpdateProfilePath(user.ProfilePath, username)
+	if err != nil {
 		logrus.Error("userService.UpdateProfilePic updateProfliePath error: ", err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.ServerError,
@@ -227,8 +227,8 @@ func (u *UserService) UpdateNickName(user entity.UserDTO) rpcEntity.RpcResponse 
 		}
 	}
 	// 更新mysql
-	res, err := mapper.UpdateNickName(user.Nickname, username)
-	if res == 0 || err != nil {
+	_, err = mapper.UpdateNickName(user.Nickname, username)
+	if err != nil {
 		logrus.Error("userService.UpdateNickName updateNickName error: ", err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.ServerError,

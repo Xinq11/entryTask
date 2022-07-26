@@ -2,86 +2,94 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
-<title>signin</title>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-}
+    <meta charset="UTF-8">
+    <title>signin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
 
-html {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    -moz-background-size: 100% 100%;
-}
+        html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+        }
 
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
 
-#signinDiv {
-    width: 37%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 300px;
-    background-color: rgba(176, 196, 222, 0.3);
-    box-shadow: 7px 7px 17px rgba(52, 56, 66, 0.5);
-    border-radius: 5px;
-}
+        #signinDiv {
+            width: 37%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(176, 196, 222, 0.3);
+            box-shadow: 7px 7px 17px rgba(52, 56, 66, 0.5);
+            border-radius: 5px;
+        }
 
-#name_trip {
-    margin-left: 50px;
-    color: black;
-    text-align: center;
-}
+        #name_trip {
+            margin-left: 50px;
+            color: black;
+            text-align: center;
+        }
 
-#password_trip {
-    margin-left: 50px;
-    color: black;
-    text-align: center;
-}
+        #password_trip {
+            margin-left: 50px;
+            color: black;
+            text-align: center;
+        }
 
-p {
-    margin-top: 30px;
-    margin-left: 20px;
-    color: black;
-    font-size: 25px;
-}
+        p {
+            margin-top: 30px;
+            margin-left: 20px;
+            color: black;
+            font-size: 25px;
+        }
 
-input {
-    margin-left: 10px;
-    border-radius: 5px;
-    border-style: hidden;
-    height: 30px;
-    width: 130px;
-    background-color: rgba(255, 255, 255, 0.5);
-    outline: none;
-    color: #000000;
-    padding-left: 15px;
-}
+        input {
+            margin-left: 10px;
+            border-radius: 5px;
+            border-style: hidden;
+            height: 30px;
+            width: 130px;
+            background-color: rgba(255, 255, 255, 0.5);
+            outline: none;
+            color: #000000;
+            padding-left: 15px;
+        }
 
-.button {
-    border-color: cornsilk;
-    background-color: rgba(248, 246, 246, 0.7);
-    color: #000000;
-    border-style: hidden;
-    border-radius: 5px;
-    width: 100px;
-    height: 50px;
-    font-size: 20px;
-}
+        .button {
+            border-color: cornsilk;
+            background-color: rgba(248, 246, 246, 0.7);
+            color: #000000;
+            border-style: hidden;
+            border-radius: 8px;
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .wrap {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0 30px 0;
+        }
 
-</style>
+    </style>
 </head>
 
 <body>
@@ -92,12 +100,11 @@ input {
 
         <p>password:<input id="password" type="password"><label id="password_trip"></label></p>
 
-        <div style="text-align: left;margin-top: 40px;">
-            <input type="submit" class="button" value="commit", onclick="sendPost()" >
-        </div>
+        <div class="wrap">
 
-        <div style="text-align: right;margin-top: 40px;">
-            <input type="" class="button" value="sign Up", onclick="signUp()" >
+            <div class="button"  onclick="sendPost()" >commit</div>
+
+            <div class="button"  onclick="signUp()" >sign up</div>
         </div>
     </form>
 </div>
@@ -116,11 +123,16 @@ input {
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
-                console.log(json)
-                console.log(json.data);
-                document.cookie="sessionID="+json.data;
-                window.location.href="userInfo.html";
-
+                if (json.errCode == 6) {
+                    let d = new Date();
+                    d.setTime(d.getTime() + (1 * 60 * 1000));
+                    let expires = "expires=" + d.toGMTString();
+                    document.cookie="sessionID=" + json.data + "; " + expires;
+                    window.location.href="userInfo.html";
+                } else {
+                    console.log(json);
+                    window.alert(json.errMsg);
+                }
             }
         };
     }

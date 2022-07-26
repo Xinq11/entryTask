@@ -3,13 +3,13 @@ package constant
 type ErrCode int
 
 const (
-	Success ErrCode = 0 + iota
-	InvalidParamsError
-	PasswordError
-	UserNotExistError
-	UserExistedError
+	ServerError ErrCode = 0 + iota
 	InvalidSessionError
-	ServerError
+	UserExistedError
+	UserNotExistError
+	PasswordError
+	InvalidParamsError
+	Success
 )
 
 func (code ErrCode) GetErrMsgByCode() string {
