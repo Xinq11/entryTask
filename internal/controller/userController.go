@@ -63,9 +63,9 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	setHttpHeader(w)
 	var req entity.HttpRequest
 	body, err := ioutil.ReadAll(r.Body)
-	logrus.Infoln(body)
+
 	err = json.Unmarshal(body, &req)
-	logrus.Infoln("controller receive param: ", req.Username, req.Password)
+	//logrus.Infoln("controller receive param: ", req.Username, req.Password)
 	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || !VerifyPassword(req.Password) {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
@@ -83,7 +83,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rpcResponse := client.Client.Call("UserService.SignIn", userDTO)
-	logrus.Infoln("controller receive rpc res: ", rpcResponse)
+	//logrus.Infoln("controller receive rpc res: ", rpcResponse)
 	var sessionID string
 	// 处理结果
 	if rpcResponse.ErrCode == constant.Success {
@@ -94,8 +94,11 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Secure:   false,
 			HttpOnly: false,
 		}
+		logrus.Infoln(cookie.Value)
 		http.SetCookie(w, &cookie)
 		sessionID = dto.SessionID
+	} else {
+		logrus.Infoln(rpcResponse.ErrCode.GetErrMsgByCode())
 	}
 	res := entity.HttpResponse{
 		ErrCode: rpcResponse.ErrCode,
@@ -138,7 +141,6 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 
 // 获取用户信息
 func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
-
 	setHttpHeader(w)
 	// 参数校验
 	c, err := r.Cookie("sessionID")
@@ -153,13 +155,13 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	}
-	logrus.Infoln("controller receive params: ", c.Value)
+	//logrus.Infoln("controller receive params: ", c.Value)
 	// RPC
 	userDTO := entity.UserDTO{
 		SessionID: c.Value,
 	}
 	rpcResponse := client.Client.Call("UserService.GetUserInfo", userDTO)
-	logrus.Infoln("controller receive rpc res: ", rpcResponse)
+	//logrus.Infoln("controller receive rpc res: ", rpcResponse)
 	// 处理结果
 	res := entity.HttpResponse{
 		ErrCode: rpcResponse.ErrCode,
@@ -227,6 +229,7 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		res.Data = ""
+		go delProfilePic(filePath)
 	}
 	js, _ := json.Marshal(res)
 	w.Write(js)
@@ -301,6 +304,14 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 		return "", err
 	}
 	return filePath, nil
+}
+
+// 删除文件
+func delProfilePic(filePath string) {
+	err := os.Remove("img/" + filePath)
+	if err != nil {
+		logrus.Error("delProfilePic error: ", err.Error())
+	}
 }
 
 // 校验密码 不合规返回false

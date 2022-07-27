@@ -24,7 +24,7 @@ func InsertUserInfo(user entity.UserDO) (int64, error) {
 
 func UpdateNickName(nickname string, username string) (int64, error) {
 	db := database.MySqlDB
-	res, err := db.Exec("update user set nickname = ? where username = ?", nickname, username)
+	res, err := db.Exec("update user set nickname = ? , gmt_modified = ? where username = ?", nickname, time.Now(), username)
 	if err != nil {
 		return 0, err
 	}
@@ -33,7 +33,7 @@ func UpdateNickName(nickname string, username string) (int64, error) {
 
 func UpdateProfilePath(profilePath string, username string) (int64, error) {
 	db := database.MySqlDB
-	res, err := db.Exec("update user set profile_path = ? where username = ?", profilePath, username)
+	res, err := db.Exec("update user set profile_path = ? , gmt_modified = ? where username = ?", profilePath, time.Now(), username)
 	if err != nil {
 		return 0, err
 	}

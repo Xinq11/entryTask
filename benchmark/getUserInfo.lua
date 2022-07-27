@@ -1,4 +1,3 @@
--- 压测登录接口脚本
 -- 获取用户信息接口脚本
 local threads = {}
 local counter = 1
@@ -15,22 +14,6 @@ function setup(thread)
 -- 将线程添加到 table 中
    table.insert(threads, thread)
    counter = counter + 1
-end
-
-wrk.headers["Content-Type"] = "application/json"
-local cnt = 0
-local num = 0
-function request()
-    if num >= 10
-    then
-        num = 0
-    end
-    local body = '{"username": "test%s","password": "testpassword%s"}'
-    body = string.format(body, cnt, num)
-    -- print(body)
-    cnt = cnt + 1
-    num = num + 1
-    return wrk.format(nil, nil, nil, body)    
 end
 
 function response(status, headers, body)

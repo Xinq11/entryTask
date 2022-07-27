@@ -136,8 +136,6 @@ func (u *UserService) SignOut(user entity.UserDTO) rpcEntity.RpcResponse {
 
 // 查看用户信息
 func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
-	startTime := time.Now()
-	defer logrus.Infoln(time.Now().Sub(startTime))
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
 	// session不存在 用户未登录或登录过期
@@ -150,6 +148,7 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 	userMap, err := manager.GetUserInfoFromRedis(username)
 	// hgetall 一个不存在key，会返回空的map{}，不会返回error
 	if err == nil && len(userMap) != 0 {
+		//logrus.Infoln(userMap)
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.Success,
 			Data: entity.UserDTO{
@@ -159,6 +158,8 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 			},
 		}
 	}
+	logrus.Infoln(err.Error())
+	logrus.Infoln("select mysql...")
 	// 查mysql
 	userDTO, err := mapper.QueryUserInfoByUsername(username)
 	if err != nil {

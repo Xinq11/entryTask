@@ -2,7 +2,6 @@
     <meta charset="UTF-8">
     <title>userInfo</title>
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -78,17 +77,20 @@
             align-items: center;
             margin-top: 50px;
         }
+
         .box {
             width: 24%;
             margin: 0 30px 0 30px;
             display: flex;
             flex-direction: column;
         }
+
         .absolute {
             position: absolute;
             bottom: 10px;
             right: 10px;
         }
+
         .text {
             font-size: 20px;
             margin-bottom: 10px;
@@ -117,11 +119,9 @@
     </div>
 
     <div class="button absolute" onclick="signOut()" >sign out</div>
-
 </div>
 
 <script>
-
     let username
     let nickname
     let profilePath
@@ -142,7 +142,7 @@
         xhr.setRequestHeader("Cookie", sessionID);
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
-            if (xhr.status == 200) {//验证请求是否发送成功
+            if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
                 if (json.errCode == 6) {
                     console.log(json)
@@ -158,8 +158,8 @@
                     obj.src = profilePath
                 } else {
                     console.log(json)
+                    window.alert(json.errMsg)
                 }
-
             }
         };
     }
@@ -168,9 +168,6 @@
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("POST", "http://localhost:9090/api/entrytask/user/signout");
-        // 获取cookie
-        //sessionID = document.cookie.split('=')[1];
-
         let cookieString = document.cookie
         if (cookieString.search("sessionID") == -1) {
             window.alert("session过期 请重新登录")
@@ -180,11 +177,14 @@
         xhr.setRequestHeader("Cookie", sessionID);
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
-            if (xhr.status == 200) {//验证请求是否发送成功
-
-                window.location.href="signIn.html";
-
-
+            if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
+                let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
+                if (json.errCode == 6) {
+                    window.location.href="signIn.html";
+                } else {
+                    console.log(json)
+                    window.alert(json.errMsg)
+                }
             }
         };
     }
@@ -208,7 +208,7 @@
         // 获取cookie
         xhr.send(data)
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
-            if (xhr.status == 200) {//验证请求是否发送成功
+            if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
                 if (json.errCode == 6) {
                     console.log(json)
@@ -217,6 +217,7 @@
                     document.getElementById("nickname").innerHTML=json.data.nickname;
                 } else {
                     console.log(json)
+                    window.alert(json.errMsg)
                 }
             }
         };
@@ -238,7 +239,7 @@
         data.append("uploadFile", profile.files[0], "default.jpg");
         xhr.send(data);
         xhr.addEventListener("readystatechange", function() {
-            if(this.readyState === 4) {
+            if(this.readyState == 4 && xhr.status == 200) {
                 console.log(this.responseText);
                 let json = JSON.parse(xhr.responseText);
                 if (json.errCode == 6) {
@@ -248,7 +249,8 @@
                     obj.src = profilePath
                     console.log("http://127.0.0.1:8887/" + json.data.profilePath)
                 } else {
-                    // tanchuang
+                    // 弹窗
+                    window.alert(json.errMsg)
                 }
             }
         });

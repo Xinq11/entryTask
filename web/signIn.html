@@ -82,13 +82,13 @@
             justify-content: center;
             align-items: center;
         }
+
         .wrap {
             display: flex;
             justify-content: space-around;
             align-items: center;
             margin: 30px 0 30px 0;
         }
-
     </style>
 </head>
 
@@ -101,9 +101,7 @@
         <p>password:<input id="password" type="password"><label id="password_trip"></label></p>
 
         <div class="wrap">
-
             <div class="button"  onclick="sendPost()" >commit</div>
-
             <div class="button"  onclick="signUp()" >sign up</div>
         </div>
     </form>
@@ -115,23 +113,23 @@
             "username": document.getElementById("username").value,
             "password": document.getElementById("password").value
         });
-
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("POST", "http://localhost:9090/api/entrytask/user/signin");
         xhr.send(data);
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
-            if (xhr.status == 200) {//验证请求是否发送成功
+            if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
                 if (json.errCode == 6) {
                     let d = new Date();
-                    d.setTime(d.getTime() + (1 * 60 * 1000));
+                    // 设置session过期时间 30分钟
+                    d.setTime(d.getTime() + (30 * 60 * 1000));
                     let expires = "expires=" + d.toGMTString();
                     document.cookie="sessionID=" + json.data + "; " + expires;
                     window.location.href="userInfo.html";
                 } else {
-                    console.log(json);
-                    window.alert(json.errMsg);
+                    console.log(json)
+                    window.alert(json.errMsg)
                 }
             }
         };
