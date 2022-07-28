@@ -1,6 +1,7 @@
 package service
 
 import (
+	"EntryTask/config"
 	"EntryTask/constant"
 	"EntryTask/internal/entity"
 	"EntryTask/internal/manager"
@@ -13,7 +14,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 	"math/rand"
-	_ "net/http/pprof"
 	"time"
 )
 
@@ -21,7 +21,6 @@ type UserService struct{}
 
 // 注册
 func (u *UserService) SignUp(user entity.UserDTO) rpcEntity.RpcResponse {
-	logrus.Infoln(user.Username)
 	// 校验用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
 	if (err != nil && err != sql.ErrNoRows) || userDO.Username != "" {
@@ -148,7 +147,6 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 	userMap, err := manager.GetUserInfoFromRedis(username)
 	// hgetall 一个不存在key，会返回空的map{}，不会返回error
 	if err == nil && len(userMap) != 0 {
-		//logrus.Infoln(userMap)
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.Success,
 			Data: entity.UserDTO{
@@ -158,10 +156,8 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 			},
 		}
 	}
-	logrus.Infoln(err.Error())
-	logrus.Infoln("select mysql...")
 	// 查mysql
-	userDTO, err := mapper.QueryUserInfoByUsername(username)
+	userDO, err := mapper.QueryUserInfoByUsername(username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return rpcEntity.RpcResponse{
@@ -175,16 +171,16 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 		}
 	}
 	// 写入redis
-	err = manager.CacheUserInfo(userDTO)
+	err = manager.CacheUserInfo(userDO)
 	if err != nil {
 		logrus.Error("userService.GetUserInfo cacheUserInfo error: ", err.Error())
 	}
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
 		Data: entity.UserDTO{
-			Username:    userDTO.Username,
-			Nickname:    userDTO.Nickname,
-			ProfilePath: userDTO.ProfilePath,
+			Username:    userDO.Username,
+			Nickname:    userDO.Nickname,
+			ProfilePath: userDO.ProfilePath,
 		},
 	}
 }
@@ -202,7 +198,7 @@ func (u *UserService) UpdateProfilePic(user entity.UserDTO) rpcEntity.RpcRespons
 	// 更新mysql
 	_, err = mapper.UpdateProfilePath(user.ProfilePath, username)
 	if err != nil {
-		logrus.Error("userService.UpdateProfilePic updateProfliePath error: ", err.Error())
+		logrus.Error("userService.UpdateProfilePic updateProfilePath error: ", err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.ServerError,
 		}
@@ -252,7 +248,7 @@ func generateSession() (string, error) {
 // 生成随机字符串
 func generateSalt() string {
 	rand.Seed(time.Now().UnixNano())
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	var letters = []rune(config.Letters)
 	salt := make([]rune, 4)
 	for i := range salt {
 		salt[i] = letters[rand.Intn(len(letters))]

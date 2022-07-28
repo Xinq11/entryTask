@@ -156,6 +156,10 @@
                     document.getElementById("nickname").innerHTML=nickname;
                     let obj = document.getElementById("profilePath");
                     obj.src = profilePath
+                } else if (json.errCode == 1) {
+                    console.log(json)
+                    window.alert("session过期 请重新登录")
+                    window.location.href="signIn.html";
                 } else {
                     console.log(json)
                     window.alert(json.errMsg)
@@ -180,6 +184,10 @@
             if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
                 if (json.errCode == 6) {
+                    window.location.href="signIn.html";
+                } else if (json.errCode == 1) {
+                    console.log(json)
+                    window.alert("session过期 请重新登录")
                     window.location.href="signIn.html";
                 } else {
                     console.log(json)
@@ -215,6 +223,10 @@
                     // 更新页面上的nickname
                     console.log(data)
                     document.getElementById("nickname").innerHTML=json.data.nickname;
+                } else if (json.errCode == 1) {
+                    console.log(json)
+                    window.alert("session过期 请重新登录")
+                    window.location.href="signIn.html";
                 } else {
                     console.log(json)
                     window.alert(json.errMsg)
@@ -248,8 +260,12 @@
                     let obj = document.getElementById("profilePath");
                     obj.src = profilePath
                     console.log("http://127.0.0.1:8887/" + json.data.profilePath)
+                } else if (json.errCode == 1) {
+                    console.log(json)
+                    window.alert("session过期 请重新登录")
+                    window.location.href="signIn.html";
                 } else {
-                    // 弹窗
+                    console.log(json)
                     window.alert(json.errMsg)
                 }
             }

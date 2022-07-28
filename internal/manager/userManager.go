@@ -16,12 +16,8 @@ func GetUserInfoFromRedis(username string) (map[string]string, error) {
 func CacheUserInfo(user entity.UserDO) error {
 	userMap := make(map[string]interface{})
 	userMap["username"] = user.Username
-	if user.Nickname != "" {
-		userMap["nickname"] = user.Nickname
-	}
-	if user.ProfilePath != "" {
-		userMap["profilePath"] = user.ProfilePath
-	}
+	userMap["nickname"] = user.Nickname
+	userMap["profilePath"] = user.ProfilePath
 	cmd := database.RedisDB.HMSet(user.Username, userMap)
 	database.RedisDB.Expire(user.Username, 30*time.Minute)
 	return cmd.Err()

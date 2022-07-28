@@ -30,10 +30,7 @@ func TestCall(t *testing.T) {
 	rpcServer.Register(rpcService)
 	go rpcServer.Accept("127.0.0.1:20000")
 	time.Sleep(5 * time.Second)
-	err := MakeClient("127.0.0.1:20000")
-	if err != nil {
-		t.Error("fail", err.Error())
-	}
+	MakeClient("127.0.0.1:20000")
 	wg := sync.WaitGroup{}
 	wg.Add(5)
 	for i := 0; i < 5; i++ {

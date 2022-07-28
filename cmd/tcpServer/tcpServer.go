@@ -14,16 +14,17 @@ import (
 func main() {
 	// 初始化日志
 	logrus.SetLevel(logrus.TraceLevel)
-	// Mysql
+	// 连接Mysql
 	database.MysqlInit()
-	// Redis
+	// 连接Redis
 	database.RedisInit()
-	// RPC Server
+	// 初始化RPC Server
 	rpcServer := server.MakeServer()
 	userService := &service.UserService{}
 	rpcService := rpcService.MakeService(userService)
 	rpcServer.Register(rpcService)
 	go rpcServer.Accept(config.RpcAddr)
+	logrus.Infoln("tcpserver start...")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	for {

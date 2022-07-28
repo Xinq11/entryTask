@@ -12,7 +12,12 @@ const (
 	RedisPoolNum  = 200
 
 	// 图片保存配置参数
+	FilePath = "img/"
 
 	// RPC
 	RpcAddr = "127.0.0.1:20000"
+	ConnNum = 2000
+
+	// salt生成字符串
+	Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"EntryTask/config"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
 	"EntryTask/rpc/rpcEntity"
@@ -12,25 +13,24 @@ type RpcClient struct {
 	connPool chan net.Conn
 }
 
-var Client RpcClient
+var Client *RpcClient
 
-func MakeClient(addr string) error {
-	connPool := make(chan net.Conn, 2000)
-	for i := 0; i < 2000; i++ {
+func MakeClient(addr string) {
+	connPool := make(chan net.Conn, config.ConnNum)
+	for i := 0; i < config.ConnNum; i++ {
 		conn, err := net.Dial("tcp", addr)
 		if err != nil {
 			logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
 		}
 		connPool <- conn
 	}
-	Client = RpcClient{
+	Client = &RpcClient{
 		connPool: connPool,
 	}
-	return nil
 }
 
 // 获取连接
-func (client RpcClient) getConn() net.Conn {
+func (client *RpcClient) getConn() net.Conn {
 	select {
 	case conn := <-client.connPool:
 		return conn
@@ -38,14 +38,14 @@ func (client RpcClient) getConn() net.Conn {
 }
 
 // 释放连接
-func (client RpcClient) releaseConn(conn net.Conn) {
+func (client *RpcClient) releaseConn(conn net.Conn) {
 	select {
 	case client.connPool <- conn:
 		return
 	}
 }
 
-func (client RpcClient) Call(methodName string, args interface{}) rpcEntity.RpcResponse {
+func (client *RpcClient) Call(methodName string, args interface{}) rpcEntity.RpcResponse {
 	conn := client.getConn()
 	defer client.releaseConn(conn)
 	request := rpcEntity.RpcRequest{

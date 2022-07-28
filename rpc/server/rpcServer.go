@@ -17,21 +17,21 @@ type RpcServer struct {
 	serviceMap map[string]*service.RPCService
 }
 
-func MakeServer() RpcServer {
-	return RpcServer{
+func MakeServer() *RpcServer {
+	return &RpcServer{
 		mu:         sync.Mutex{},
 		serviceMap: make(map[string]*service.RPCService),
 	}
 }
 
-func (server RpcServer) Register(svc *service.RPCService) {
+func (server *RpcServer) Register(svc *service.RPCService) {
 	server.mu.Lock()
 	defer server.mu.Unlock()
 	server.serviceMap[svc.ServiceName] = svc
 
 }
 
-func (server RpcServer) Accept(addr string) {
+func (server *RpcServer) Accept(addr string) {
 	// 监听端口
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -72,7 +72,10 @@ func (server RpcServer) Accept(addr string) {
 					logrus.Error("rpcServer.Accept encode error: ", err.Error())
 				}
 				// 发送数据
-				network.Send(conn, data)
+				err = network.Send(conn, data)
+				if err != nil {
+					logrus.Error("rpcServer.Accept send error: ", err.Error())
+				}
 			}
 		}(accept)
 	}

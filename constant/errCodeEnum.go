@@ -29,6 +29,6 @@ func (code ErrCode) GetErrMsgByCode() string {
 	case ServerError:
 		return "ServerError"
 	default:
-		return "Unknow"
+		return "UnKnow"
 	}
 }

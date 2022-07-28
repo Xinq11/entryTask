@@ -1,5 +1,6 @@
 package entity
 
+// UserDO mysql映射对象
 type UserDO struct {
 	Id          int    `db:"id"`
 	Username    string `db:"username"`

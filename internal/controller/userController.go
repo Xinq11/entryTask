@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"EntryTask/config"
 	"EntryTask/constant"
 	"EntryTask/internal/entity"
 	"EntryTask/rpc/client"
@@ -11,24 +12,18 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 )
 
 // 注册
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	//w.Header().Set("Content-Type", "application/json")
 	setHttpHeader(w)
 	// 参数校验
-	/*
-		username := r.PostFormValue("username")
-		password := r.PostFormValue("password")
-	*/
 	var req entity.HttpRequest
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &req)
-	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || !VerifyPassword(req.Password) {
+	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || req.Password == "" {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -56,17 +51,12 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 // 登录
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
-
-	// 参数校验
-	//username := r.PostFormValue("username")
-	//password := r.PostFormValue("password")
 	setHttpHeader(w)
+	// 参数校验
 	var req entity.HttpRequest
 	body, err := ioutil.ReadAll(r.Body)
-
 	err = json.Unmarshal(body, &req)
-	//logrus.Infoln("controller receive param: ", req.Username, req.Password)
-	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || !VerifyPassword(req.Password) {
+	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || req.Password == "" {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -81,9 +71,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		Username: req.Username,
 		Password: req.Password,
 	}
-
 	rpcResponse := client.Client.Call("UserService.SignIn", userDTO)
-	//logrus.Infoln("controller receive rpc res: ", rpcResponse)
 	var sessionID string
 	// 处理结果
 	if rpcResponse.ErrCode == constant.Success {
@@ -91,14 +79,10 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		cookie := http.Cookie{
 			Name:     "sessionID",
 			Value:    dto.SessionID,
-			Secure:   false,
 			HttpOnly: false,
 		}
-		logrus.Infoln(cookie.Value)
 		http.SetCookie(w, &cookie)
 		sessionID = dto.SessionID
-	} else {
-		logrus.Infoln(rpcResponse.ErrCode.GetErrMsgByCode())
 	}
 	res := entity.HttpResponse{
 		ErrCode: rpcResponse.ErrCode,
@@ -145,7 +129,6 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	// 参数校验
 	c, err := r.Cookie("sessionID")
 	if err != nil || c == nil {
-		logrus.Infoln(err.Error())
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidSessionError,
 			ErrMsg:  constant.InvalidSessionError.GetErrMsgByCode(),
@@ -155,13 +138,11 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	}
-	//logrus.Infoln("controller receive params: ", c.Value)
 	// RPC
 	userDTO := entity.UserDTO{
 		SessionID: c.Value,
 	}
 	rpcResponse := client.Client.Call("UserService.GetUserInfo", userDTO)
-	//logrus.Infoln("controller receive rpc res: ", rpcResponse)
 	// 处理结果
 	res := entity.HttpResponse{
 		ErrCode: rpcResponse.ErrCode,
@@ -187,7 +168,6 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 	// 参数校验
 	c, err := r.Cookie("sessionID")
 	username := r.PostFormValue("username")
-	logrus.Infoln("controller receive params: ", c.Value, username)
 	if err != nil || c == nil || len(username) < 4 || len(username) > 13 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
@@ -198,7 +178,6 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(js)
 		return
 	}
-
 	// 处理图片
 	filePath, err := saveProfilePic(r, username)
 	if err != nil {
@@ -240,7 +219,6 @@ func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
 	setHttpHeader(w)
 	// 参数校验
 	c, err := r.Cookie("sessionID")
-	// nickname := r.PostFormValue("nickname")
 	var req entity.HttpRequest
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &req)
@@ -277,6 +255,7 @@ func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
+// 跨域资源共享
 func setHttpHeader(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -293,8 +272,7 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 	fileName := strings.Split(header.Filename, ".")
 	// 拼接文件名
 	filePath := username + "-" + time.Now().Format("2006-01-02") + "." + fileName[len(fileName)-1]
-	logrus.Infoln("saveProfilePic : ", filePath)
-	f, err := os.OpenFile("img/"+filePath, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(config.FilePath+filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	defer f.Close()
 	if err != nil {
 		return "", err
@@ -308,16 +286,8 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 
 // 删除文件
 func delProfilePic(filePath string) {
-	err := os.Remove("img/" + filePath)
+	err := os.Remove(config.FilePath + filePath)
 	if err != nil {
 		logrus.Error("delProfilePic error: ", err.Error())
 	}
-}
-
-// 校验密码 不合规返回false
-func VerifyPassword(password string) bool {
-	// 正则
-	myRegex := regexp.MustCompile("^([a-zA-Z]*[0-9]*){7,16}$")
-	res := myRegex.MatchString(password)
-	return res
 }

@@ -17,10 +17,10 @@ func TestUserService_SignUp(t *testing.T) {
 		Password: "1234567",
 	}
 	res := userService.SignUp(param)
-	if res.Err_code != constant.Success {
-		t.Error("signUp " + res.Err_code.GetErrMsgByCode())
+	if res.ErrCode != constant.Success {
+		t.Error("signUp " + res.ErrCode.GetErrMsgByCode())
 	} else {
-		t.Log("signUp " + res.Err_code.GetErrMsgByCode())
+		t.Log("signUp " + res.ErrCode.GetErrMsgByCode())
 	}
 }
 
@@ -34,10 +34,10 @@ func TestUserService_SignIn(t *testing.T) {
 		Password: "123456",
 	}
 	res := userService.SignIn(param)
-	if res.Err_code != constant.Success {
-		t.Error("signIn " + res.Err_code.GetErrMsgByCode())
+	if res.ErrCode != constant.Success {
+		t.Error("signIn " + res.ErrCode.GetErrMsgByCode())
 	} else {
-		t.Log("signIn " + res.Err_code.GetErrMsgByCode())
+		t.Log("signIn " + res.ErrCode.GetErrMsgByCode())
 	}
 }
 
@@ -50,10 +50,10 @@ func TestUserService_SignOut(t *testing.T) {
 		SessionID: "1ab00e57-10ae-4742-a461-fad16b536515",
 	}
 	res := userService.SignOut(param)
-	if res.Err_code != constant.Success {
-		t.Error("signOut " + res.Err_code.GetErrMsgByCode())
+	if res.ErrCode != constant.Success {
+		t.Error("signOut " + res.ErrCode.GetErrMsgByCode())
 	} else {
-		t.Log("signOut " + res.Err_code.GetErrMsgByCode())
+		t.Log("signOut " + res.ErrCode.GetErrMsgByCode())
 	}
 }
 
@@ -66,10 +66,10 @@ func TestUserService_GetUserInfo(t *testing.T) {
 		Username: "xq",
 	}
 	res := userService.GetUserInfo(param)
-	if res.Err_code != constant.Success {
-		t.Error("getUserInfo " + res.Err_code.GetErrMsgByCode())
+	if res.ErrCode != constant.Success {
+		t.Error("getUserInfo " + res.ErrCode.GetErrMsgByCode())
 	} else {
-		t.Log("getUserInfo " + res.Err_code.GetErrMsgByCode())
+		t.Log("getUserInfo " + res.ErrCode.GetErrMsgByCode())
 	}
 }
 
@@ -83,10 +83,10 @@ func TestUserService_UpdateProfilePic(t *testing.T) {
 		ProfilePath: "ysds.jpg",
 	}
 	res := userService.UpdateProfilePic(param)
-	if res.Err_code != constant.Success {
-		t.Error("updateNickName " + res.Err_code.GetErrMsgByCode())
+	if res.ErrCode != constant.Success {
+		t.Error("updateNickName " + res.ErrCode.GetErrMsgByCode())
 	} else {
-		t.Log("updateNickName " + res.Err_code.GetErrMsgByCode())
+		t.Log("updateNickName " + res.ErrCode.GetErrMsgByCode())
 	}
 }
 
@@ -100,9 +100,9 @@ func TestUserService_UpdateNickName(t *testing.T) {
 		Nickname: "young",
 	}
 	res := userService.UpdateNickName(param)
-	if res.Err_code != constant.Success {
-		t.Error("updateNickName " + res.Err_code.GetErrMsgByCode())
+	if res.ErrCode != constant.Success {
+		t.Error("updateNickName " + res.ErrCode.GetErrMsgByCode())
 	} else {
-		t.Log("updateNickName " + res.Err_code.GetErrMsgByCode())
+		t.Log("updateNickName " + res.ErrCode.GetErrMsgByCode())
 	}
 }

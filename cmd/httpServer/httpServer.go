@@ -9,6 +9,7 @@ import (
 	_ "net/http/pprof"
 )
 
+// 路由
 func route() {
 	http.HandleFunc("/api/entrytask/user/signup", controller.SignUpHandler)
 	http.HandleFunc("/api/entrytask/user/signin", controller.SignInHandler)
@@ -21,14 +22,12 @@ func route() {
 func main() {
 	// 初始化日志
 	logrus.SetLevel(logrus.TraceLevel)
-	// RPC Client
-	err := client.MakeClient(config.RpcAddr)
-	if err != nil {
-		logrus.Panic("RPC MakeClient error: ", err.Error())
-	}
-	// HTTP Server
+	// 初始化RPC Client
+	client.MakeClient(config.RpcAddr)
+	// 启动HTTP Server
 	route()
-	err = http.ListenAndServe(":9090", nil) // 设置监听的端口
+	logrus.Infoln("httpserver start...")
+	err := http.ListenAndServe(":9090", nil) // 设置监听的端口
 	if err != nil {
 		logrus.Panic("HttpServer ListenAndServe error: ", err.Error())
 	}
