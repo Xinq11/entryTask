@@ -36,7 +36,7 @@ end
 function response(status, headers, body)
 -- 每得到一次请求的响应 判断请求是否成功
     if status == 200 then
-           if string.find(body, "6") ~= nil then
+           if string.find(body, "7") ~= nil then
                 thread_success = thread_success + 1
            else
                 thread_fail = thread_fail + 1

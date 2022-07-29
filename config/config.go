@@ -13,11 +13,16 @@ const (
 
 	// 图片保存配置参数
 	FilePath = "img/"
+	LogPath  = "logger/"
 
-	// RPC
+	// RPC配置
 	RpcAddr = "127.0.0.1:20000"
 	ConnNum = 2000
 
 	// salt生成字符串
 	Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	// 用户信息默认值
+	DefaultNickname    = "default"
+	DefaultProfilePath = "default-2022-07-26.jpg"
 )

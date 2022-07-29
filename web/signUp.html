@@ -121,7 +121,9 @@
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);
-                if (json.errCode == 6) {
+                if (json.errCode == 7) {
+                    // 加弹窗
+                    window.alert("注册成功 即将跳转登录界面")
                     window.location.href="signIn.html";
                 } else{
                     console.log(json)

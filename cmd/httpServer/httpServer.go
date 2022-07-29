@@ -3,6 +3,7 @@ package main
 import (
 	"EntryTask/config"
 	"EntryTask/internal/controller"
+	"EntryTask/logger"
 	"EntryTask/rpc/client"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -21,7 +22,7 @@ func route() {
 
 func main() {
 	// 初始化日志
-	logrus.SetLevel(logrus.TraceLevel)
+	logger.Init()
 	// 初始化RPC Client
 	client.MakeClient(config.RpcAddr)
 	// 启动HTTP Server

@@ -2,11 +2,11 @@ package server
 
 import (
 	"EntryTask/constant"
+	"EntryTask/logger"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
 	"EntryTask/rpc/rpcEntity"
 	"EntryTask/rpc/service"
-	"github.com/sirupsen/logrus"
 	"net"
 	"strings"
 	"sync"
@@ -35,7 +35,7 @@ func (server *RpcServer) Accept(addr string) {
 	// 监听端口
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
-		logrus.Panic("rpcServer.accept error: ", err.Error())
+		logger.Panic("rpcServer.accept error: " + err.Error())
 	}
 	for {
 		accept, _ := listen.Accept()
@@ -45,12 +45,12 @@ func (server *RpcServer) Accept(addr string) {
 				// 读取数据
 				data, err := network.Read(conn)
 				if err != nil {
-					logrus.Error("rpcServer.Accept read error: ", err.Error())
+					logger.Error("rpcServer.Accept read error: " + err.Error())
 				}
 				// 解码
 				req, err := codec.ReqDecode(data)
 				if err != nil {
-					logrus.Error("rpcServer.Accept decode error: ", err.Error())
+					logger.Error("rpcServer.Accept decode error: " + err.Error())
 				}
 				server.mu.Lock()
 				index := strings.LastIndex(req.MethodName, ".")
@@ -61,7 +61,7 @@ func (server *RpcServer) Accept(addr string) {
 				res := rpcEntity.RpcResponse{}
 				// 调用处理函数
 				if !ok {
-					logrus.Error("rpcServer.Accept error: ", err.Error())
+					logger.Error("rpcServer.Accept error: " + err.Error())
 					res.ErrCode = constant.ServerError
 				} else {
 					res = svc.RpcHandler(methodName, req)
@@ -69,12 +69,12 @@ func (server *RpcServer) Accept(addr string) {
 				// 编码
 				data, err = codec.Encode(res)
 				if err != nil {
-					logrus.Error("rpcServer.Accept encode error: ", err.Error())
+					logger.Error("rpcServer.Accept encode error: " + err.Error())
 				}
 				// 发送数据
 				err = network.Send(conn, data)
 				if err != nil {
-					logrus.Error("rpcServer.Accept send error: ", err.Error())
+					logger.Error("rpcServer.Accept send error: " + err.Error())
 				}
 			}
 		}(accept)

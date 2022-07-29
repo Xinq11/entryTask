@@ -4,6 +4,7 @@ import (
 	"EntryTask/config"
 	"EntryTask/database"
 	"EntryTask/internal/service"
+	"EntryTask/logger"
 	"EntryTask/rpc/server"
 	rpcService "EntryTask/rpc/service"
 	"github.com/sirupsen/logrus"
@@ -13,7 +14,8 @@ import (
 
 func main() {
 	// 初始化日志
-	logrus.SetLevel(logrus.TraceLevel)
+	//logrus.SetLevel(logrus.TraceLevel)
+	logger.Init()
 	// 连接Mysql
 	database.MysqlInit()
 	// 连接Redis

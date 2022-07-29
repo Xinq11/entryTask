@@ -120,12 +120,18 @@
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
                 let json = JSON.parse(xhr.responseText);//获取到服务端返回的数据
-                if (json.errCode == 6) {
+                console.log(xhr.getAllResponseHeaders())
+                console.log(json)
+                if (json.errCode == 7) {
+                    /**
                     let d = new Date();
                     // 设置session过期时间 30分钟
                     d.setTime(d.getTime() + (30 * 60 * 1000));
                     let expires = "expires=" + d.toGMTString();
                     document.cookie="sessionID=" + json.data + "; " + expires;
+                     */
+                    console.log(window.document)
+                    window.alert("登录成功")
                     window.location.href="userInfo.html";
                 } else {
                     console.log(json)

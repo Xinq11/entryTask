@@ -4,6 +4,7 @@ type ErrCode int
 
 const (
 	ServerError ErrCode = 0 + iota
+	DataBaseError
 	InvalidSessionError
 	UserExistedError
 	UserNotExistError
@@ -26,6 +27,8 @@ func (code ErrCode) GetErrMsgByCode() string {
 		return "UserExistedError"
 	case InvalidSessionError:
 		return "InvalidSessionError"
+	case DataBaseError:
+		return "DataBaseError"
 	case ServerError:
 		return "ServerError"
 	default:

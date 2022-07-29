@@ -2,9 +2,9 @@ package service
 
 import (
 	"EntryTask/constant"
+	"EntryTask/logger"
 	"EntryTask/rpc/rpcEntity"
 	"errors"
-	"github.com/sirupsen/logrus"
 	"reflect"
 )
 
@@ -39,7 +39,7 @@ func (svc *RPCService) RpcHandler(methodName string, req rpcEntity.RpcRequest) r
 		res := function.Call([]reflect.Value{svc.svcValue, reflect.ValueOf(req.Args)})
 		return res[0].Interface().(rpcEntity.RpcResponse)
 	} else {
-		logrus.Error("rpcService.RpcHandler error: ", errors.New("UnKnown method").Error())
+		logger.Error("rpcService.RpcHandler error: " + errors.New("UnKnown method").Error())
 		reply := rpcEntity.RpcResponse{
 			ErrCode: constant.ServerError,
 		}

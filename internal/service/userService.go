@@ -6,13 +6,13 @@ import (
 	"EntryTask/internal/entity"
 	"EntryTask/internal/manager"
 	"EntryTask/internal/mapper"
+	"EntryTask/logger"
 	"EntryTask/rpc/rpcEntity"
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
 	"errors"
 	"github.com/gofrs/uuid"
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
 )
@@ -20,18 +20,22 @@ import (
 type UserService struct{}
 
 // 注册
-func (u *UserService) SignUp(user entity.UserDTO) rpcEntity.RpcResponse {
+func (u *UserService) SignUp(user entity.UserDTO) (res rpcEntity.RpcResponse) {
+	logger.Info("userService.SignUp receive userDTO is: " + user.ToString())
+	defer func() {
+		logger.Info("userService.SignUp response is: " + res.ToString())
+	}()
 	// 校验用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
 	if (err != nil && err != sql.ErrNoRows) || userDO.Username != "" {
+		logger.Error("userService.SignUp queryUserInfoByUsername error: " + err.Error())
 		if userDO.Username != "" {
 			return rpcEntity.RpcResponse{
 				ErrCode: constant.UserExistedError,
 			}
 		} else {
-			logrus.Error("userService.SignUp queryUserInfoByUsername error: ", err.Error())
 			return rpcEntity.RpcResponse{
-				ErrCode: constant.ServerError,
+				ErrCode: constant.DataBaseError,
 			}
 		}
 	}
@@ -43,15 +47,15 @@ func (u *UserService) SignUp(user entity.UserDTO) rpcEntity.RpcResponse {
 		Salt:        salt,
 		Password:    password,
 		Username:    user.Username,
-		Nickname:    "default",
-		ProfilePath: "default-2022-07-26.jpg",
+		Nickname:    config.DefaultNickname,
+		ProfilePath: config.DefaultProfilePath,
 	}
 	// 存入mysql
-	res, err := mapper.InsertUserInfo(userDO)
-	if res == 0 || err != nil {
-		logrus.Error("userService.SignUp insertUserInfo error: ", err.Error())
+	num, err := mapper.InsertUserInfo(userDO)
+	if num == 0 || err != nil {
+		logger.Error("userService.SignUp insertUserInfo error: " + err.Error())
 		return rpcEntity.RpcResponse{
-			ErrCode: constant.ServerError,
+			ErrCode: constant.DataBaseError,
 		}
 	}
 	return rpcEntity.RpcResponse{
@@ -60,18 +64,22 @@ func (u *UserService) SignUp(user entity.UserDTO) rpcEntity.RpcResponse {
 }
 
 // 登录
-func (u *UserService) SignIn(user entity.UserDTO) rpcEntity.RpcResponse {
+func (u *UserService) SignIn(user entity.UserDTO) (res rpcEntity.RpcResponse) {
+	logger.Info("userService.SignIn receive userDTO is: " + user.ToString())
+	defer func() {
+		logger.Info("userService.SignIn receive is: " + res.ToString())
+	}()
 	// 校验查看用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
 	if err != nil {
+		logger.Error("userService.SignUp queryUserInfoByUsername error: " + err.Error())
 		if err == sql.ErrNoRows {
 			return rpcEntity.RpcResponse{
 				ErrCode: constant.UserNotExistError,
 			}
 		} else {
-			logrus.Error("userService.SignIn queryUserInfoByUsername error: ", err.Error())
 			return rpcEntity.RpcResponse{
-				ErrCode: constant.ServerError,
+				ErrCode: constant.DataBaseError,
 			}
 		}
 	}
@@ -85,7 +93,7 @@ func (u *UserService) SignIn(user entity.UserDTO) rpcEntity.RpcResponse {
 	// 生成session
 	sessionID, err := generateSession()
 	if err != nil {
-		logrus.Error("userService.SignIn generateSession error: ", err.Error())
+		logger.Error("userService.SignIn generateSession error: " + err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.ServerError,
 		}
@@ -93,14 +101,13 @@ func (u *UserService) SignIn(user entity.UserDTO) rpcEntity.RpcResponse {
 	// 写入redis
 	err = manager.CacheSession(sessionID, user.Username)
 	if err != nil {
-		logrus.Error("userService.SignIn cacheSession error: ", err.Error())
+		logger.Error("userService.SignIn cacheSession error: " + err.Error())
 		return rpcEntity.RpcResponse{
-			ErrCode: constant.ServerError,
+			ErrCode: constant.DataBaseError,
 		}
 	}
-	err = manager.CacheUserInfo(userDO)
-	if err != nil {
-		logrus.Error("userService.SignIn cacheUserInfo error: ", err.Error())
+	if err = manager.CacheUserInfo(userDO); err != nil {
+		logger.Error("userService.SignIn cacheUserInfo error: " + err.Error())
 	}
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
@@ -111,7 +118,11 @@ func (u *UserService) SignIn(user entity.UserDTO) rpcEntity.RpcResponse {
 }
 
 // 登出
-func (u *UserService) SignOut(user entity.UserDTO) rpcEntity.RpcResponse {
+func (u *UserService) SignOut(user entity.UserDTO) (res rpcEntity.RpcResponse) {
+	logger.Info("userService.SignOut receive userDTO is: " + user.ToString())
+	defer func() {
+		logger.Info("userService.SignOut receive is: " + res.ToString())
+	}()
 	// 验证session
 	_, err := manager.GetSession(user.SessionID)
 	// session不存在 用户未登录或登录过期
@@ -123,9 +134,9 @@ func (u *UserService) SignOut(user entity.UserDTO) rpcEntity.RpcResponse {
 	// 删除sessionID
 	err = manager.DelSession(user.SessionID)
 	if err != nil {
-		logrus.Error("userService.SignOut delSession error: ", err.Error())
+		logger.Error("userService.SignOut delSession error: " + err.Error())
 		return rpcEntity.RpcResponse{
-			ErrCode: constant.ServerError,
+			ErrCode: constant.DataBaseError,
 		}
 	}
 	return rpcEntity.RpcResponse{
@@ -134,7 +145,11 @@ func (u *UserService) SignOut(user entity.UserDTO) rpcEntity.RpcResponse {
 }
 
 // 查看用户信息
-func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
+func (u *UserService) GetUserInfo(user entity.UserDTO) (res rpcEntity.RpcResponse) {
+	logger.Info("userService.GetUserInfo receive userDTO is: " + user.ToString())
+	defer func() {
+		logger.Info("userService.GetUserInfo receive is: " + res.ToString())
+	}()
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
 	// session不存在 用户未登录或登录过期
@@ -159,21 +174,20 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 	// 查mysql
 	userDO, err := mapper.QueryUserInfoByUsername(username)
 	if err != nil {
+		logger.Error("userService.GetUserInfo queryUserInfoByUsername error: " + err.Error())
 		if err == sql.ErrNoRows {
 			return rpcEntity.RpcResponse{
 				ErrCode: constant.UserNotExistError,
 			}
 		} else {
-			logrus.Error("userService.GetUserInfo queryUserInfoByUsername error: ", err.Error())
 			return rpcEntity.RpcResponse{
-				ErrCode: constant.ServerError,
+				ErrCode: constant.DataBaseError,
 			}
 		}
 	}
 	// 写入redis
-	err = manager.CacheUserInfo(userDO)
-	if err != nil {
-		logrus.Error("userService.GetUserInfo cacheUserInfo error: ", err.Error())
+	if err = manager.CacheUserInfo(userDO); err != nil {
+		logger.Error("userService.GetUserInfo cacheUserInfo error: " + err.Error())
 	}
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
@@ -186,7 +200,11 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) rpcEntity.RpcResponse {
 }
 
 // 编辑头像
-func (u *UserService) UpdateProfilePic(user entity.UserDTO) rpcEntity.RpcResponse {
+func (u *UserService) UpdateProfilePic(user entity.UserDTO) (res rpcEntity.RpcResponse) {
+	logger.Info("userService.UpdateProfilePic receive userDTO is: " + user.ToString())
+	defer func() {
+		logger.Info("userService.UpdateProfilePic receive is: " + res.ToString())
+	}()
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
 	// session不存在 用户未登录或登录过期
@@ -198,23 +216,24 @@ func (u *UserService) UpdateProfilePic(user entity.UserDTO) rpcEntity.RpcRespons
 	// 更新mysql
 	_, err = mapper.UpdateProfilePath(user.ProfilePath, username)
 	if err != nil {
-		logrus.Error("userService.UpdateProfilePic updateProfilePath error: ", err.Error())
+		logger.Error("userService.UpdateProfilePic updateProfilePath error: " + err.Error())
 		return rpcEntity.RpcResponse{
-			ErrCode: constant.ServerError,
+			ErrCode: constant.DataBaseError,
 		}
 	}
 	// 删除缓存
-	retryDelUserInfo(username)
+	go retryDelUserInfo(username)
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
-		Data: entity.UserDTO{
-			ProfilePath: "sss",
-		},
 	}
 }
 
 // 编辑昵称
-func (u *UserService) UpdateNickName(user entity.UserDTO) rpcEntity.RpcResponse {
+func (u *UserService) UpdateNickName(user entity.UserDTO) (res rpcEntity.RpcResponse) {
+	logger.Info("userService.UpdateNickName receive userDTO is: " + user.ToString())
+	defer func() {
+		logger.Info("userService.UpdateNickName receive is: " + res.ToString())
+	}()
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
 	// session不存在 用户未登录或登录过期
@@ -226,16 +245,15 @@ func (u *UserService) UpdateNickName(user entity.UserDTO) rpcEntity.RpcResponse 
 	// 更新mysql
 	_, err = mapper.UpdateNickName(user.Nickname, username)
 	if err != nil {
-		logrus.Error("userService.UpdateNickName updateNickName error: ", err.Error())
+		logger.Error("userService.UpdateNickName updateNickName error: " + err.Error())
 		return rpcEntity.RpcResponse{
-			ErrCode: constant.ServerError,
+			ErrCode: constant.DataBaseError,
 		}
 	}
 	// 删除缓存
-	retryDelUserInfo(username)
+	go retryDelUserInfo(username)
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
-		Data:    user.Nickname,
 	}
 }
 
@@ -275,6 +293,6 @@ func retryDelUserInfo(username string) {
 		retryTimes++
 	}
 	if err != nil {
-		logrus.Warn("retryDelUserInfo error: ", err.Error())
+		logger.Warn("userService.retryDelUserInfo DelUserInfo error: " + err.Error())
 	}
 }

@@ -2,10 +2,10 @@ package client
 
 import (
 	"EntryTask/config"
+	"EntryTask/logger"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
 	"EntryTask/rpc/rpcEntity"
-	"github.com/sirupsen/logrus"
 	"net"
 )
 
@@ -20,7 +20,8 @@ func MakeClient(addr string) {
 	for i := 0; i < config.ConnNum; i++ {
 		conn, err := net.Dial("tcp", addr)
 		if err != nil {
-			logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
+			logger.Error("rpcClient.MakeClient net dial error: " + err.Error())
+			//logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
 		}
 		connPool <- conn
 	}
@@ -55,22 +56,22 @@ func (client *RpcClient) Call(methodName string, args interface{}) rpcEntity.Rpc
 	// 编码
 	encode, err := codec.Encode(request)
 	if err != nil {
-		logrus.Error("rpcClient.Call encode error: ", err.Error())
+		logger.Error("rpcClient.Call encode error: " + err.Error())
 	}
 	// 发送
 	err = network.Send(conn, encode)
 	if err != nil {
-		logrus.Error("rpcClient.Call send error: ", err.Error())
+		logger.Error("rpcClient.Call send error: " + err.Error())
 	}
 	// 接收
 	read, err := network.Read(conn)
 	if err != nil {
-		logrus.Error("rpcClient.Call read error: ", err.Error())
+		logger.Error("rpcClient.Call read error: " + err.Error())
 	}
 	// 解码
 	decode, err := codec.ResDecode(read)
 	if err != nil {
-		logrus.Error("rpcClient.Call decode error: ", err.Error())
+		logger.Error("rpcClient.Call decode error: " + err.Error())
 	}
 	return decode
 }
