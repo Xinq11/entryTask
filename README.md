@@ -144,13 +144,11 @@
 | password | string | 密码<br />长度限制：[4,13] |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data": ""
 }
-// fail
 {
     "errCode":"6",
     "errMsg":"InvalidParamsError",
@@ -173,13 +171,11 @@
 | sessionID | string | 设置在set-cookie中返回 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":""
 }
-// fail
 {
     "errCode":"5",
     "errMsg":"PasswordError",
@@ -195,13 +191,11 @@
 | sessionID | string | 从cookie中获取 |
 
 ```json
-// success
 {
   "errCode":"7",
   "errMsg":"success",
   "data":""
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
@@ -209,10 +203,8 @@
 }
 ```
 <a name="GbzKu"></a>
-### <br />
-<a name="hRbLv"></a>
 ### 查看用户信息
-**GET  api/entrytask/user/get_user_info **<br />**入参**
+**GET  api/entrytask/user/get_user_info**<br />**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
@@ -227,7 +219,6 @@
 | profilePath | string | 图片路径 |
 
 ```json
-// success
 {
   "errCode":"7",
   "errMsg":"success",
@@ -237,7 +228,6 @@
     "profilePath":"test-2022-08-01.jpg",
   }
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
@@ -261,7 +251,6 @@
 | profilePath | string | 图片路径 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
@@ -269,7 +258,6 @@
         "profilePath":"test-2022-08-01.jpg"
     }
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidParamsError",
@@ -292,13 +280,11 @@
 | nickname | string | 昵称 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":"xxxxx"
 }
-// fail
 {
     "errCode":"0",
     "errMsg":"ServerError",
