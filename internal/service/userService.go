@@ -67,7 +67,7 @@ func (u *UserService) SignUp(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 func (u *UserService) SignIn(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	logger.Info("userService.SignIn receive userDTO is: " + user.ToString())
 	defer func() {
-		logger.Info("userService.SignIn receive is: " + res.ToString())
+		logger.Info("userService.SignIn response is: " + res.ToString())
 	}()
 	// 校验查看用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
@@ -121,7 +121,7 @@ func (u *UserService) SignIn(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 func (u *UserService) SignOut(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	logger.Info("userService.SignOut receive userDTO is: " + user.ToString())
 	defer func() {
-		logger.Info("userService.SignOut receive is: " + res.ToString())
+		logger.Info("userService.SignOut response is: " + res.ToString())
 	}()
 	// 验证session
 	_, err := manager.GetSession(user.SessionID)
@@ -148,7 +148,7 @@ func (u *UserService) SignOut(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 func (u *UserService) GetUserInfo(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	logger.Info("userService.GetUserInfo receive userDTO is: " + user.ToString())
 	defer func() {
-		logger.Info("userService.GetUserInfo receive is: " + res.ToString())
+		logger.Info("userService.GetUserInfo response is: " + res.ToString())
 	}()
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
@@ -203,7 +203,7 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) (res rpcEntity.RpcRespons
 func (u *UserService) UpdateProfilePic(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	logger.Info("userService.UpdateProfilePic receive userDTO is: " + user.ToString())
 	defer func() {
-		logger.Info("userService.UpdateProfilePic receive is: " + res.ToString())
+		logger.Info("userService.UpdateProfilePic response is: " + res.ToString())
 	}()
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
@@ -232,7 +232,7 @@ func (u *UserService) UpdateProfilePic(user entity.UserDTO) (res rpcEntity.RpcRe
 func (u *UserService) UpdateNickName(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	logger.Info("userService.UpdateNickName receive userDTO is: " + user.ToString())
 	defer func() {
-		logger.Info("userService.UpdateNickName receive is: " + res.ToString())
+		logger.Info("userService.UpdateNickName response is: " + res.ToString())
 	}()
 	// 验证session
 	username, err := manager.GetSession(user.SessionID)
