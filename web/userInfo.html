@@ -130,18 +130,6 @@
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("GET", "http://localhost:9090/api/entrytask/user/get_user_info");
-        // 获取cookie
-        /**
-        let cookieString = document.cookie
-        if (cookieString.search("sessionID") == -1) {
-            window.alert("session过期 请重新登录")
-            window.location.href="signIn.html";
-        }
-        let sessionID = cookieString.split('=')[1];
-        console.logger(sessionID)
-        console.logger("window_onload", sessionID)
-        xhr.setRequestHeader("Cookie", sessionID);
-         */
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
@@ -174,15 +162,6 @@
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("POST", "http://localhost:9090/api/entrytask/user/signout");
-        /**
-        let cookieString = document.cookie
-        if (cookieString.search("sessionID") == -1) {
-            window.alert("session过期 请重新登录")
-            window.location.href="signIn.html";
-        }
-        let sessionID = cookieString.split('=')[1];
-        xhr.setRequestHeader("Cookie", sessionID);
-         */
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功
@@ -214,17 +193,6 @@
         let data = JSON.stringify({
             "nickname": document.getElementById("updateNickname").value,
         });
-        /**
-        let cookieString = document.cookie
-        if (cookieString.search("sessionID") == -1) {
-            window.alert("session过期 请重新登录")
-            window.location.href="signIn.html";
-        }
-        let sessionID = cookieString.split('=')[1];
-        xhr.setRequestHeader("Cookie", sessionID);
-
-        console.logger("nikename", sessionID)
-         */
         console.log(data.nickname)
         // 获取cookie
         xhr.send(data)
@@ -252,15 +220,6 @@
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
         xhr.open("POST", "http://localhost:9090/api/entrytask/user/update_profile_pic");
-        /**
-        let cookieString = document.cookie
-        if (cookieString.search("sessionID") == -1) {
-            window.alert("session过期 请重新登录")
-            window.location.href="signIn.html";
-        }
-        let sessionID = cookieString.split('=')[1];
-        xhr.setRequestHeader("Cookie", sessionID);
-         */
         let data = new FormData();
         data.append("username", username);
         data.append("uploadFile", profile.files[0], "default.jpg");

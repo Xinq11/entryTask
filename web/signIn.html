@@ -123,13 +123,6 @@
                 console.log(xhr.getAllResponseHeaders())
                 console.log(json)
                 if (json.errCode == 7) {
-                    /**
-                    let d = new Date();
-                    // 设置session过期时间 30分钟
-                    d.setTime(d.getTime() + (30 * 60 * 1000));
-                    let expires = "expires=" + d.toGMTString();
-                    document.cookie="sessionID=" + json.data + "; " + expires;
-                     */
                     console.log(window.document)
                     window.alert("登录成功")
                     window.location.href="userInfo.html";

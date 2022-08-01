@@ -123,17 +123,8 @@ func (u *UserService) SignOut(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	defer func() {
 		logger.Info("userService.SignOut response is: " + res.ToString())
 	}()
-	// 验证session
-	_, err := manager.GetSession(user.SessionID)
-	// session不存在 用户未登录或登录过期
-	if err != nil {
-		return rpcEntity.RpcResponse{
-			ErrCode: constant.InvalidSessionError,
-		}
-	}
 	// 删除sessionID
-	err = manager.DelSession(user.SessionID)
-	if err != nil {
+	if err := manager.DelSession(user.SessionID); err != nil {
 		logger.Error("userService.SignOut delSession error: " + err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.DataBaseError,
