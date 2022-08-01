@@ -118,7 +118,7 @@
 **client**：RPC客户端，用于发起远程服务调用<br />**server**：RPC服务端，用于根据服务名称选择服务，并返回调用结果<br />**service**：RPC具体服务，实现反射处理远程调用具体逻辑，得到本地方法运行结果
 <a name="SJToI"></a>
 #### 流程图
-![](https://cdn.nlark.com/yuque/__puml/6c077f780a37e331527fa22071e8d874.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcImNvbnRyb2xsZXJcIiBhcyBjb250cm9sbGVyXG5wYXJ0aWNpcGFudCBcIlJQQyBDbGllbnRcIiBhcyBjbGllbnRcbnBhcnRpY2lwYW50IFwiUlBDIFNlcnZlclwiIGFzIHNlcnZlclxucGFydGljaXBhbnQgXCJSUEMgU2VydmljZVwiIGFzIHN2Y1xucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxuXG5jbGllbnQgLT4gY2xpZW50OiBNYWtlQ2xpZW50XG5ybm90ZSBvdmVyIGNsaWVudFxuTWFrZUNsaWVudFxu5Yib5bu6dGNw6L-e5o6l5rGgXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiAgc2VydmVyOiBNYWtlU2VydmVyXG5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbk1ha2VTZXJ2ZXJcbuWIm-W7unNlcnZpY2VOYW1l5ZKMc2VydmljZeaYoOWwhOihqFxuZW5kcm5vdGVcblxuc3ZjIC0-IHN2YzogTWFrZVNlcnZpY2VcbnJub3RlIG92ZXIgc3ZjXG5NYWtlU2VydmljZVxu5Yib5bu6bWV0aG9kTmFtZeWSjG1ldGhvZOaYoOWwhOihqFxuZW5kcm5vdGVcblxuc2VydmVyIC0-IHN2YzogcmVnaXN0ZXJcbnJub3RlIG92ZXIgc3ZjXG7lsIZzZXJ2aWNl5re75Yqg5Yiwc2VydmVy56uv55qEbWFw5LitXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiBzZXJ2ZXI6IEFjY2VwdFxcbuebkeWQrOerr-WPo1xuYWN0aXZhdGUgc2VydmVyXG5cblxuXG5jb250cm9sbGVyIC0-IGNsaWVudDog6LCD55SoY2xpZW50LmNhbGwg5Y-R6LW3cnBj6LCD55SoXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5hY3RpdmF0ZSBjbGllbnRcblxucm5vdGUgb3ZlciBjbGllbnRcbmVuY29kZVxuZW5kcm5vdGVcblxuY2xpZW50IC0-IHNlcnZlcjogdGNwIGNvbm5lY3QgLi4uLi5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbmRlY29kZVxuZW5kcm5vdGVcblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEc2VydmljZU5hbWVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBzdmM6IOmAieaLqXNlcnZpY2VcbmFjdGl2YXRlIHN2Y1xucm5vdGUgb3ZlciBzdmNcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEbWV0aG9kTmFtZVxuZW5kcm5vdGVcblxuc3ZjIC0-IHNlcnZpY2U6IOWPjeWwhOiwg-eUqOacrOWcsOaWueazlVxuYWN0aXZhdGUgc2VydmljZVxuc2VydmljZSAtPiBzdmM6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5zdmMgLT4gc2VydmVyOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgc3ZjXG5cbnJub3RlIG92ZXIgc2VydmVyXG5lbmNvZGVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBjbGllbnQ6IHRjcCBjb25uZWN0IC4uLi4uXG5cblxucm5vdGUgb3ZlciBjbGllbnRcbmRlY29kZVxuZW5kcm5vdGVcbmNsaWVudC0-Y29udHJvbGxlcjog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIGNsaWVudFxuZGVhY3RpdmF0ZSBjb250cm9sbGVyXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sLzZjMDc3Zjc4MGEzN2UzMzE1MjdmYTIyMDcxZThkODc0LnN2ZyIsImlkIjoiVkV3QjkiLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)![](https://cdn.nlark.com/yuque/0/2022/jpeg/21719644/1657608067652-c80d8ed2-9ad6-4a80-9dff-fc2282ddf80c.jpeg)
+![](https://cdn.nlark.com/yuque/__puml/6c077f780a37e331527fa22071e8d874.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcImNvbnRyb2xsZXJcIiBhcyBjb250cm9sbGVyXG5wYXJ0aWNpcGFudCBcIlJQQyBDbGllbnRcIiBhcyBjbGllbnRcbnBhcnRpY2lwYW50IFwiUlBDIFNlcnZlclwiIGFzIHNlcnZlclxucGFydGljaXBhbnQgXCJSUEMgU2VydmljZVwiIGFzIHN2Y1xucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxuXG5jbGllbnQgLT4gY2xpZW50OiBNYWtlQ2xpZW50XG5ybm90ZSBvdmVyIGNsaWVudFxuTWFrZUNsaWVudFxu5Yib5bu6dGNw6L-e5o6l5rGgXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiAgc2VydmVyOiBNYWtlU2VydmVyXG5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbk1ha2VTZXJ2ZXJcbuWIm-W7unNlcnZpY2VOYW1l5ZKMc2VydmljZeaYoOWwhOihqFxuZW5kcm5vdGVcblxuc3ZjIC0-IHN2YzogTWFrZVNlcnZpY2VcbnJub3RlIG92ZXIgc3ZjXG5NYWtlU2VydmljZVxu5Yib5bu6bWV0aG9kTmFtZeWSjG1ldGhvZOaYoOWwhOihqFxuZW5kcm5vdGVcblxuc2VydmVyIC0-IHN2YzogcmVnaXN0ZXJcbnJub3RlIG92ZXIgc3ZjXG7lsIZzZXJ2aWNl5re75Yqg5Yiwc2VydmVy56uv55qEbWFw5LitXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiBzZXJ2ZXI6IEFjY2VwdFxcbuebkeWQrOerr-WPo1xuYWN0aXZhdGUgc2VydmVyXG5cblxuXG5jb250cm9sbGVyIC0-IGNsaWVudDog6LCD55SoY2xpZW50LmNhbGwg5Y-R6LW3cnBj6LCD55SoXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5hY3RpdmF0ZSBjbGllbnRcblxucm5vdGUgb3ZlciBjbGllbnRcbmVuY29kZVxuZW5kcm5vdGVcblxuY2xpZW50IC0-IHNlcnZlcjogdGNwIGNvbm5lY3QgLi4uLi5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbmRlY29kZVxuZW5kcm5vdGVcblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEc2VydmljZU5hbWVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBzdmM6IOmAieaLqXNlcnZpY2VcbmFjdGl2YXRlIHN2Y1xucm5vdGUgb3ZlciBzdmNcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEbWV0aG9kTmFtZVxuZW5kcm5vdGVcblxuc3ZjIC0-IHNlcnZpY2U6IOWPjeWwhOiwg-eUqOacrOWcsOaWueazlVxuYWN0aXZhdGUgc2VydmljZVxuc2VydmljZSAtPiBzdmM6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5zdmMgLT4gc2VydmVyOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgc3ZjXG5cbnJub3RlIG92ZXIgc2VydmVyXG5lbmNvZGVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBjbGllbnQ6IHRjcCBjb25uZWN0IC4uLi4uXG5cblxucm5vdGUgb3ZlciBjbGllbnRcbmRlY29kZVxuZW5kcm5vdGVcbmNsaWVudC0-Y29udHJvbGxlcjog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIGNsaWVudFxuZGVhY3RpdmF0ZSBjb250cm9sbGVyXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sLzZjMDc3Zjc4MGEzN2UzMzE1MjdmYTIyMDcxZThkODc0LnN2ZyIsImlkIjoiVkV3QjkiLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)![]
 <a name="W5L88"></a>
 ## 四、接口设计
 <a name="lws9T"></a>
@@ -144,13 +144,11 @@
 | password | string | 密码<br />长度限制：[4,13] |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data": ""
 }
-// fail
 {
     "errCode":"6",
     "errMsg":"InvalidParamsError",
@@ -173,13 +171,11 @@
 | sessionID | string | 设置在set-cookie中返回 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":""
 }
-// fail
 {
     "errCode":"5",
     "errMsg":"PasswordError",
@@ -195,13 +191,11 @@
 | sessionID | string | 从cookie中获取 |
 
 ```json
-// success
 {
   "errCode":"7",
   "errMsg":"success",
   "data":""
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
@@ -209,8 +203,6 @@
 }
 ```
 <a name="GbzKu"></a>
-### <br />
-<a name="hRbLv"></a>
 ### 查看用户信息
 **GET  api/entrytask/user/get_user_info**<br />**入参**
 
@@ -227,7 +219,6 @@
 | profilePath | string | 图片路径 |
 
 ```json
-// success
 {
   "errCode":"7",
   "errMsg":"success",
@@ -237,7 +228,6 @@
     "profilePath":"test-2022-08-01.jpg",
   }
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
@@ -261,7 +251,6 @@
 | profilePath | string | 图片路径 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
@@ -269,7 +258,6 @@
         "profilePath":"test-2022-08-01.jpg"
     }
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidParamsError",
@@ -292,13 +280,11 @@
 | nickname | string | 昵称 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":"xxxxx"
 }
-// fail
 {
     "errCode":"0",
     "errMsg":"ServerError",
@@ -376,7 +362,7 @@ wrk -c2000 -t8 -d120s -s benchmark/signIn.lua --latency http://localhost:9090/ap
 ## **九、遗留问题与风险预估**
 rpc超时处理
 
-<br />
+_<br />
 <a name="AvVRu"></a>
 ## **十、附录**
 无
