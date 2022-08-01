@@ -4,6 +4,7 @@ import (
 	"EntryTask/internal/entity"
 	"EntryTask/rpc/rpcEntity"
 	"EntryTask/rpc/server"
+	"fmt"
 	"sync"
 
 	"EntryTask/rpc/service"
@@ -34,7 +35,10 @@ func TestCall(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		go func() {
 			call := Client.Call("test.Add", entity.UserDTO{Username: "xq"})
-			if call.ErrCode == 0 {
+			fmt.Println(call)
+			if call.ErrCode == 7 {
+				dto := call.Data.(entity.UserDTO)
+				fmt.Println(dto.Username)
 				t.Log("success", call.Data)
 			} else {
 				t.Error("fail", call.ErrCode.GetErrMsgByCode())

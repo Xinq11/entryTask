@@ -24,7 +24,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	var req entity.HttpRequest
 	err := paramParse(r, &req)
 	logger.Info("userController.SignUpHandler receive HttpRequest is: " + req.ToString())
-	if err != nil || req.Username == "" || req.Password == "" {
+	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || len(req.Password) < 4 || len(req.Password) > 13 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -58,7 +58,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	var req entity.HttpRequest
 	err := paramParse(r, &req)
 	logger.Info("userController.SignInHandler receive HttpRequest is: " + req.ToString())
-	if err != nil || req.Username == "" || req.Password == "" {
+	if err != nil || len(req.Username) < 4 || len(req.Username) > 13 || len(req.Password) < 4 || len(req.Password) > 13 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -174,7 +174,7 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.PostFormValue("username")
 	filePath, err := saveProfilePic(r, username)
 	logger.Info(fmt.Sprintf("userController.UpdateProfilePicHandler receive sessionID is %v; username is %v; filePath is %v", sessionID.String(), username, filePath))
-	if err != nil || sessionID == nil || username == "" {
+	if err != nil || sessionID == nil || len(username) < 4 || len(username) > 13 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -216,7 +216,7 @@ func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID, err := r.Cookie("sessionID")
 	err = paramParse(r, &req)
 	logger.Info(fmt.Sprintf("userController.UpdateNicknameHandler receive HttpRequest is : %v; sessionID is %v", req.ToString(), sessionID.String()))
-	if err != nil || sessionID == nil || req.Nickname == "" {
+	if err != nil || sessionID == nil || len([]rune(req.Nickname)) < 1 || len([]rune(req.Nickname)) > 8 {
 		res := entity.HttpResponse{
 			ErrCode: constant.InvalidParamsError,
 			ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),

@@ -52,12 +52,17 @@ func (server *RpcServer) Accept(addr string) {
 				if err != nil {
 					logger.Error("rpcServer.Accept decode error: " + err.Error())
 				}
-				server.mu.Lock()
-				index := strings.LastIndex(req.MethodName, ".")
-				serviceName := req.MethodName[:index]
-				methodName := req.MethodName[index+1:]
-				svc, ok := server.serviceMap[serviceName]
-				server.mu.Unlock()
+				ok := false
+				var methodName string
+				var svc *service.RPCService
+				if req.MethodName != "" && strings.Contains(req.MethodName, ".") {
+					server.mu.Lock()
+					index := strings.LastIndex(req.MethodName, ".")
+					serviceName := req.MethodName[:index]
+					methodName = req.MethodName[index+1:]
+					svc, ok = server.serviceMap[serviceName]
+					server.mu.Unlock()
+				}
 				res := rpcEntity.RpcResponse{}
 				// 调用处理函数
 				if !ok {
