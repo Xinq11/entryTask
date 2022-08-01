@@ -28,12 +28,12 @@ func (u *UserService) SignUp(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	// 校验用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
 	if (err != nil && err != sql.ErrNoRows) || userDO.Username != "" {
-		logger.Error("userService.SignUp queryUserInfoByUsername error: " + err.Error())
 		if userDO.Username != "" {
 			return rpcEntity.RpcResponse{
 				ErrCode: constant.UserExistedError,
 			}
 		} else {
+			logger.Error("userService.SignUp queryUserInfoByUsername error: " + err.Error())
 			return rpcEntity.RpcResponse{
 				ErrCode: constant.DataBaseError,
 			}
@@ -51,8 +51,8 @@ func (u *UserService) SignUp(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 		ProfilePath: config.DefaultProfilePath,
 	}
 	// 存入mysql
-	num, err := mapper.InsertUserInfo(userDO)
-	if num == 0 || err != nil {
+	_, err = mapper.InsertUserInfo(userDO)
+	if err != nil {
 		logger.Error("userService.SignUp insertUserInfo error: " + err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.DataBaseError,

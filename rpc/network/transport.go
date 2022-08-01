@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-const headerLen = 10
+const headerLen = 4
 
 func Send(conn net.Conn, data []byte) error {
 	buf := make([]byte, headerLen+len(data))

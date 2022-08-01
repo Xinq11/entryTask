@@ -132,7 +132,7 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// 获取用户信息 我记得需求里面有提到 RESTful？
+// 获取用户信息
 func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		setHttpHeader(w)
