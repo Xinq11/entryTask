@@ -35,7 +35,7 @@ func (server *RpcServer) Accept(addr string) {
 	// 监听端口
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
-		logger.Panic("rpcServer.accept error: " + err.Error())
+		logger.Panic("rpcServer.accept listen error: " + err.Error())
 	}
 	for {
 		accept, _ := listen.Accept()
@@ -66,7 +66,7 @@ func (server *RpcServer) Accept(addr string) {
 				res := rpcEntity.RpcResponse{}
 				// 调用处理函数
 				if !ok {
-					logger.Error("rpcServer.Accept error: " + err.Error())
+					logger.Error("rpcServer.Accept handler error: " + err.Error())
 					res.ErrCode = constant.ServerError
 				} else {
 					res = svc.RpcHandler(methodName, req)

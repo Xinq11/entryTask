@@ -100,7 +100,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 // 登出
 func SignOutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "GET" {
 		setHttpHeader(w)
 		// 参数校验
 		sessionID, err := r.Cookie("sessionID")

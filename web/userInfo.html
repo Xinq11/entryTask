@@ -161,7 +161,7 @@
     function signOut() {
         let xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
-        xhr.open("POST", "http://localhost:9090/api/entrytask/user/signout");
+        xhr.open("GET", "http://localhost:9090/api/entrytask/user/signout");
         xhr.send();
         xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
             if (xhr.readyState == 4 && xhr.status == 200) {//验证请求是否发送成功

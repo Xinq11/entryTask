@@ -2,6 +2,7 @@ package client
 
 import (
 	"EntryTask/config"
+	"EntryTask/constant"
 	"EntryTask/logger"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
@@ -21,7 +22,6 @@ func MakeClient(addr string) {
 		conn, err := net.Dial("tcp", addr)
 		if err != nil {
 			logger.Error("rpcClient.MakeClient net dial error: " + err.Error())
-			//logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
 		}
 		connPool <- conn
 	}
@@ -57,21 +57,25 @@ func (client *RpcClient) Call(methodName string, args interface{}) rpcEntity.Rpc
 	encode, err := codec.Encode(request)
 	if err != nil {
 		logger.Error("rpcClient.Call encode error: " + err.Error())
+		return rpcEntity.RpcResponse{ErrCode: constant.ServerError}
 	}
 	// 发送
 	err = network.Send(conn, encode)
 	if err != nil {
 		logger.Error("rpcClient.Call send error: " + err.Error())
+		return rpcEntity.RpcResponse{ErrCode: constant.ServerError}
 	}
 	// 接收
 	read, err := network.Read(conn)
 	if err != nil {
 		logger.Error("rpcClient.Call read error: " + err.Error())
+		return rpcEntity.RpcResponse{ErrCode: constant.ServerError}
 	}
 	// 解码
-	decode, err := codec.ResDecode(read)
+	res, err := codec.ResDecode(read)
 	if err != nil {
 		logger.Error("rpcClient.Call decode error: " + err.Error())
+		return rpcEntity.RpcResponse{ErrCode: constant.ServerError}
 	}
-	return decode
+	return res
 }
