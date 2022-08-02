@@ -12,6 +12,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -300,7 +301,7 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 	}
 	fileName := strings.Split(header.Filename, ".")
 	// 拼接文件名
-	filePath := username + "-" + time.Now().Format("2006-01-02") + "." + fileName[len(fileName)-1]
+	filePath := username + "-" + strconv.FormatInt(time.Now().Unix(), 10) + "." + fileName[len(fileName)-1]
 	f, err := os.OpenFile(config.FilePath+filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	defer f.Close()
 	if err != nil {
