@@ -14,7 +14,6 @@ import (
 
 func main() {
 	// 初始化日志
-	//logrus.SetLevel(logrus.TraceLevel)
 	logger.Init()
 	// 连接Mysql
 	database.MysqlInit()
