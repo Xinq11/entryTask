@@ -17,7 +17,7 @@ type test struct {
 
 func (t test) Add(a entity.UserDTO) rpcEntity.RpcResponse {
 	return rpcEntity.RpcResponse{
-		ErrCode: 0,
+		ErrCode: 7,
 		Data:    a.Username + "rpc",
 	}
 }
@@ -31,14 +31,12 @@ func TestCall(t *testing.T) {
 	time.Sleep(5 * time.Second)
 	MakeClient("127.0.0.1:20001")
 	wg := sync.WaitGroup{}
-	wg.Add(5)
-	for i := 0; i < 5; i++ {
+	wg.Add(10)
+	for i := 0; i < 10; i++ {
 		go func() {
 			call := Client.Call("test.Add", entity.UserDTO{Username: "xq"})
 			fmt.Println(call)
 			if call.ErrCode == 7 {
-				dto := call.Data.(entity.UserDTO)
-				fmt.Println(dto.Username)
 				t.Log("success", call.Data)
 			} else {
 				t.Error("fail", call.ErrCode.GetErrMsgByCode())

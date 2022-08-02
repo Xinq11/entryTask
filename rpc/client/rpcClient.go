@@ -1,54 +1,39 @@
 package client
 
 import (
-	"EntryTask/config"
 	"EntryTask/constant"
 	"EntryTask/logger"
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
+	"EntryTask/rpc/pool"
 	"EntryTask/rpc/rpcEntity"
-	"net"
 )
 
 type RpcClient struct {
-	connPool chan net.Conn
+	connPool *pool.Pool
 }
 
 var Client *RpcClient
 
-func MakeClient(addr string) {
-	connPool := make(chan net.Conn, config.ConnNum)
-	for i := 0; i < config.ConnNum; i++ {
-		conn, err := net.Dial("tcp", addr)
-		if err != nil {
-			logger.Error("rpcClient.MakeClient net dial error: " + err.Error())
-		}
-		connPool <- conn
+func MakeClient(addr string) error {
+	pool, err := pool.Init(addr)
+	if err != nil {
+		return err
 	}
 	Client = &RpcClient{
-		connPool: connPool,
+		connPool: pool,
 	}
+	return nil
 }
 
-// 获取连接
-func (client *RpcClient) getConn() net.Conn {
-	select {
-	case conn := <-client.connPool:
-		return conn
-	}
-}
-
-// 释放连接
-func (client *RpcClient) releaseConn(conn net.Conn) {
-	select {
-	case client.connPool <- conn:
-		return
-	}
-}
-
+// 发起远程过程调用
 func (client *RpcClient) Call(methodName string, args interface{}) rpcEntity.RpcResponse {
-	conn := client.getConn()
-	defer client.releaseConn(conn)
+	conn, err := client.connPool.GetConn()
+	if err != nil {
+		logger.Error("rpcClient.Call GetConn error: " + err.Error())
+		return rpcEntity.RpcResponse{ErrCode: constant.ServerError}
+	}
+	defer client.connPool.ReleaseConn(conn)
 	request := rpcEntity.RpcRequest{
 		MethodName: methodName,
 		Args:       args,

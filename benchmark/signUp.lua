@@ -1,5 +1,6 @@
 --调用注册接口，向数据库导入1000w条测试数据
 wrk.headers["Content-Type"] = "application/json"
+wrk.method = "POST"
 local cnt = 9988367
 local num = 7
 function request()

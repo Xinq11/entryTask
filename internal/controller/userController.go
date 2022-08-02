@@ -7,7 +7,6 @@ import (
 	"EntryTask/logger"
 	rpcClient "EntryTask/rpc/client"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -31,6 +30,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 				ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
 				Data:    "",
 			}
+			// json.Marshal参数类型不为无效类型(Chan,Func)或无效值(math.Inf,math.NaN)则可忽略err
 			js, _ := json.Marshal(res)
 			w.Write(js)
 			return
@@ -41,13 +41,13 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			Password: req.Password,
 		}
 		rpcResponse := rpcClient.Client.Call("UserService.SignUp", userDTO)
+		// 处理结果
 		res := entity.HttpResponse{
 			ErrCode: rpcResponse.ErrCode,
 			ErrMsg:  rpcResponse.ErrCode.GetErrMsgByCode(),
 			Data:    "",
 		}
 		logger.Info("userController.SignUpHandler response is: " + res.ToString())
-		// 处理结果
 		js, _ := json.Marshal(res)
 		w.Write(js)
 	}
@@ -104,8 +104,8 @@ func SignOutHandler(w http.ResponseWriter, r *http.Request) {
 		setHttpHeader(w)
 		// 参数校验
 		sessionID, err := r.Cookie("sessionID")
-		logger.Info("userController.SignOutHandler receive sessionID is: " + sessionID.String())
-		if err != nil || sessionID == nil {
+		if err != nil {
+			logger.Error("userController.SignOutHandler getSessionID error: " + err.Error())
 			res := entity.HttpResponse{
 				ErrCode: constant.InvalidSessionError,
 				ErrMsg:  constant.InvalidSessionError.GetErrMsgByCode(),
@@ -138,8 +138,8 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		setHttpHeader(w)
 		// 参数校验
 		sessionID, err := r.Cookie("sessionID")
-		logger.Info("userController.GetUserInfoHandler receive sessionID is: " + sessionID.String())
-		if err != nil || sessionID == nil {
+		if err != nil {
+			logger.Error("userController.GetUserInfoHandler getSessionID error: " + err.Error())
 			res := entity.HttpResponse{
 				ErrCode: constant.InvalidSessionError,
 				ErrMsg:  constant.InvalidSessionError.GetErrMsgByCode(),
@@ -181,12 +181,24 @@ func UpdateProfilePicHandler(w http.ResponseWriter, r *http.Request) {
 		// 参数校验
 		sessionID, err := r.Cookie("sessionID")
 		username := r.PostFormValue("username")
-		filePath, err := saveProfilePic(r, username)
-		logger.Info(fmt.Sprintf("userController.UpdateProfilePicHandler receive sessionID is %v; username is %v; filePath is %v", sessionID.String(), username, filePath))
-		if err != nil || sessionID == nil || len(username) < 4 || len(username) > 13 {
+		logger.Info("userController.UpdateProfilePicHandler receive username is: " + username)
+		if err != nil || len(username) < 4 || len(username) > 13 {
 			res := entity.HttpResponse{
 				ErrCode: constant.InvalidParamsError,
 				ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
+				Data:    "",
+			}
+			js, _ := json.Marshal(res)
+			w.Write(js)
+			return
+		}
+		// 保存图片
+		filePath, err := saveProfilePic(r, username)
+		if err != nil {
+			logger.Error("userController.UpdateProfilePicHandler saveProfilePic error: " + err.Error())
+			res := entity.HttpResponse{
+				ErrCode: constant.ServerError,
+				ErrMsg:  constant.ServerError.GetErrMsgByCode(),
 				Data:    "",
 			}
 			js, _ := json.Marshal(res)
@@ -224,10 +236,10 @@ func UpdateNicknameHandler(w http.ResponseWriter, r *http.Request) {
 		setHttpHeader(w)
 		// 参数校验
 		var req entity.HttpRequest
-		sessionID, err := r.Cookie("sessionID")
-		err = paramParse(r, &req)
-		logger.Info(fmt.Sprintf("userController.UpdateNicknameHandler receive HttpRequest is : %v; sessionID is %v", req.ToString(), sessionID.String()))
-		if err != nil || sessionID == nil || len([]rune(req.Nickname)) < 1 || len([]rune(req.Nickname)) > 8 {
+		sessionID, cookieErr := r.Cookie("sessionID")
+		paramErr := paramParse(r, &req)
+		logger.Info("userController.UpdateNicknameHandler receive HttpRequest is: " + req.ToString())
+		if cookieErr != nil || paramErr != nil || len([]rune(req.Nickname)) < 1 || len([]rune(req.Nickname)) > 8 {
 			res := entity.HttpResponse{
 				ErrCode: constant.InvalidParamsError,
 				ErrMsg:  constant.InvalidParamsError.GetErrMsgByCode(),
@@ -303,6 +315,6 @@ func saveProfilePic(r *http.Request, username string) (string, error) {
 // 删除文件
 func delProfilePic(filePath string) {
 	if err := os.Remove(config.FilePath + filePath); err != nil {
-		logger.Warn("userController.delProfilePic error: " + err.Error())
+		logger.Error("userController.delProfilePic error: " + err.Error())
 	}
 }

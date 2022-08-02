@@ -17,6 +17,7 @@ type RpcServer struct {
 	serviceMap map[string]*service.RPCService
 }
 
+// 初始化RPC服务端
 func MakeServer() *RpcServer {
 	return &RpcServer{
 		mu:         sync.Mutex{},
@@ -45,6 +46,11 @@ func (server *RpcServer) Accept(addr string) {
 				// 读取数据
 				data, err := network.Read(conn)
 				if err != nil {
+					//Read方法返回EOF错误，表示本端感知到对端已经关闭连接（本端已接收到对端发送的FIN）。此后如果本端不调用Close方法，只释放本端的连接对象，则连接处于非完全关闭状态（CLOSE_WAIT）。即文件描述符发生泄漏。
+					if err.Error() == "EOF" {
+						conn.Close()
+						break
+					}
 					logger.Error("rpcServer.Accept read error: " + err.Error())
 				}
 				// 解码
@@ -55,6 +61,7 @@ func (server *RpcServer) Accept(addr string) {
 				ok := false
 				var methodName string
 				var svc *service.RPCService
+				// 判断rpc请求的服务是否存在
 				if req.MethodName != "" && strings.Contains(req.MethodName, ".") {
 					server.mu.Lock()
 					index := strings.LastIndex(req.MethodName, ".")
@@ -64,7 +71,7 @@ func (server *RpcServer) Accept(addr string) {
 					server.mu.Unlock()
 				}
 				res := rpcEntity.RpcResponse{}
-				// 调用处理函数
+				// 如果rpc请求的服务存在，则反射调用本地方法
 				if !ok {
 					logger.Error("rpcServer.Accept handler error: " + err.Error())
 					res.ErrCode = constant.ServerError

@@ -18,6 +18,7 @@ const (
 	// RPC配置
 	RpcAddr = "127.0.0.1:20000"
 	ConnNum = 2000
+	ConnMax = 2048
 
 	// salt生成字符串
 	Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

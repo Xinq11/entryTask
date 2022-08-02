@@ -16,7 +16,7 @@ function setup(thread)
    table.insert(threads, thread)
    counter = counter + 1
 end
-
+wrk.method = "POST"
 wrk.headers["Content-Type"] = "application/json"
 local cnt = 0
 local num = 0

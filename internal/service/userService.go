@@ -69,7 +69,7 @@ func (u *UserService) SignIn(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	defer func() {
 		logger.Info("userService.SignIn response is: " + res.ToString())
 	}()
-	// 校验查看用户是否存在
+	// 校验用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
 	if err != nil {
 		logger.Error("userService.SignUp queryUserInfoByUsername error: " + err.Error())
@@ -91,7 +91,7 @@ func (u *UserService) SignIn(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 		}
 	}
 	// 生成session
-	sessionID, err := generateSession()
+	sessionID, err := generateSession(user.Username)
 	if err != nil {
 		logger.Error("userService.SignIn generateSession error: " + err.Error())
 		return rpcEntity.RpcResponse{
@@ -213,7 +213,7 @@ func (u *UserService) UpdateProfilePic(user entity.UserDTO) (res rpcEntity.RpcRe
 		}
 	}
 	// 删除缓存
-	go retryDelUserInfo(username)
+	retryDelUserInfo(username)
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
 	}
@@ -242,16 +242,20 @@ func (u *UserService) UpdateNickName(user entity.UserDTO) (res rpcEntity.RpcResp
 		}
 	}
 	// 删除缓存
-	go retryDelUserInfo(username)
+	retryDelUserInfo(username)
 	return rpcEntity.RpcResponse{
 		ErrCode: constant.Success,
 	}
 }
 
 // 生成session
-func generateSession() (string, error) {
-	cmd, err := uuid.NewV4()
-	return cmd.String(), err
+func generateSession(username string) (string, error) {
+	uid, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	sessionID := uuid.NewV3(uid, username)
+	return sessionID.String(), nil
 }
 
 // 生成随机字符串

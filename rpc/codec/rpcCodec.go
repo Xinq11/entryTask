@@ -7,6 +7,7 @@ import (
 	"encoding/gob"
 )
 
+// 序列化
 func Encode(data interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 	gob.Register(rpcEntity.RpcResponse{})
@@ -18,6 +19,7 @@ func Encode(data interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// RpcRequest反序列化
 func ReqDecode(data []byte) (rpcEntity.RpcRequest, error) {
 	gob.Register(entity.UserDTO{})
 	buf := bytes.NewBuffer(data)
@@ -27,6 +29,7 @@ func ReqDecode(data []byte) (rpcEntity.RpcRequest, error) {
 	return req, err
 }
 
+// RpcResponse反序列化
 func ResDecode(data []byte) (rpcEntity.RpcResponse, error) {
 	gob.Register(entity.UserDTO{})
 	buf := bytes.NewBuffer(data)

@@ -14,6 +14,7 @@ type RPCService struct {
 	methodMap   map[string]reflect.Method
 }
 
+// 初始化rpc服务
 func MakeService(svcStruct interface{}) *RPCService {
 	svc := &RPCService{}
 	svcType := reflect.TypeOf(svcStruct)
@@ -21,7 +22,7 @@ func MakeService(svcStruct interface{}) *RPCService {
 	// reflect.Indirect: ptr ->ptr.Value 获取service名称
 	svc.ServiceName = reflect.Indirect(svc.svcValue).Type().Name()
 	svc.methodMap = make(map[string]reflect.Method)
-	// 遍历service方法，统计到map中
+	// 遍历service的方法，初始化到map中
 	for i := 0; i < svcType.NumMethod(); i++ {
 		method := svcType.Method(i)
 		methodName := method.Name
@@ -32,7 +33,7 @@ func MakeService(svcStruct interface{}) *RPCService {
 
 // 反射调用本地方法
 func (svc *RPCService) RpcHandler(methodName string, req rpcEntity.RpcRequest) rpcEntity.RpcResponse {
-	// 判断service是否存在请求方法
+	// 判断service是否存在rpc请求的方法
 	if method, ok := svc.methodMap[methodName]; ok {
 		function := method.Func
 		// 反射调用本地方法
