@@ -46,8 +46,8 @@ func (server *RpcServer) Accept(addr string) {
 				// 读取数据
 				data, err := network.Read(conn)
 				if err != nil {
-					// 客户端断开连接
-					if err.Error() == "EOF" || strings.Contains(err.Error(), "connection rest by peer") {
+					// 写端断开连接
+					if err.Error() == "EOF" {
 						break
 					}
 					logger.Error("rpcServer.Accept read error: " + err.Error())
@@ -85,8 +85,9 @@ func (server *RpcServer) Accept(addr string) {
 				// 发送数据
 				err = network.Send(conn, data)
 				if err != nil {
-					if strings.Contains(err.Error(), "broken pipe") {
-						continue
+					// 读端关闭连接
+					if strings.Contains(err.Error(), "broken pipe") || strings.Contains(err.Error(), "connection rest by peer") {
+						break
 					}
 					logger.Error("rpcServer.Accept send error: " + err.Error())
 				}
