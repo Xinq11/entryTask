@@ -208,7 +208,7 @@
 ```
 <a name="hRbLv"></a>
 ### 查看用户信息
-**GET  api/entrytask/user/get_user_info **<br />**入参**
+**GET  api/entrytask/user/get_user_info**<br />**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
@@ -378,7 +378,7 @@ wrk -c2000 -t8 -d120s -s benchmark/signIn.lua --latency http://localhost:9090/ap
 ![随机 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659462183139-f6db1eb7-680c-4fcb-b224-ee59bc2513b2.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=uf2594552&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%202000.png&originHeight=748&originWidth=2160&originalType=binary&ratio=1&rotation=0&showTitle=false&size=158226&status=done&style=none&taskId=u50188d76-357b-4b80-ab6e-eb3c1ad7f6a&title=)
 <a name="tmhcV"></a>
 ## **九、遗留问题与风险预估**
-接口设计存在冗余，可以简化<br />rpc动态代理，超时处理
+接口设计存在冗余，可以简化<br />rpc动态代理，连接池优化
 
 <a name="AvVRu"></a>
 ## **十、附录**
