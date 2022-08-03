@@ -215,7 +215,7 @@
 ```
 <a name="hRbLv"></a>
 ### 查看用户信息
-**GET  api/entrytask/user/get_user_info **<br />**入参**
+**GET  api/entrytask/user/get_user_info**<br />**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
