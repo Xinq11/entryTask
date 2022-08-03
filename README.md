@@ -88,7 +88,7 @@
 ## **三、核心逻辑详细设计**
 <a name="iJrpz"></a>
 ### 注册流程
-![](https://cdn.nlark.com/yuque/__puml/cd9e737e5c24526380a23be6ffb7e088.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmn6XnnIvnlKjmiLfmmK_lkKblrZjlnKhcbmFjdGl2YXRlIG15c3FsXG5cbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnueUqOaIt-S_oeaBr1xuZGVhY3RpdmF0ZSBteXNxbFxucm5vdGUgb3ZlciBzZXJ2aWNlXG7lr4bnoIHliqDlr4ZcbmVuZHJub3RlXG5cbnNlcnZpY2UgLT4gbXlzcWw6IOWtmOWCqOeUqOaIt-S_oeaBr1xuYWN0aXZhdGUgbXlzcWxcbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBteXNxbFxuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvY2Q5ZTczN2U1YzI0NTI2MzgwYTIzYmU2ZmZiN2UwODguc3ZnIiwiaWQiOiJLSzlLUiIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)<a name="HQIEL"></a>
+![](https://cdn.nlark.com/yuque/__puml/5b4d215a31e517a5df3d9445a36d0b04.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmn6XnnIvnlKjmiLfmmK_lkKblrZjlnKhcbmFjdGl2YXRlIG15c3FsXG5cbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnueUqOaIt-S_oeaBr1xucm5vdGUgb3ZlciBzZXJ2aWNlXG7lr4bnoIHliqDlr4ZcbmVuZHJub3RlXG5cbnNlcnZpY2UgLT4gbXlzcWw6IOWtmOWCqOeUqOaIt-S_oeaBr1xubXlzcWwgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIG15c3FsXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5kZWFjdGl2YXRlIHNlcnZpY2Vcblxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lpITnkIbnu5PmnpxcbmVuZHJub3RlXG5cbmNvbnRyb2xsZXIgLT4gd2ViOiBodHRwIHJlc3BvbnNlXG5cblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC81YjRkMjE1YTMxZTUxN2E1ZGYzZDk0NDVhMzZkMGIwNC5zdmciLCJpZCI6IktLOUtSIiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="HQIEL"></a>
 ### 登录流程
 ![](https://cdn.nlark.com/yuque/__puml/550869d9c453748f1b46e5a0533f3e18.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmn6XnnIvnlKjmiLfmmK_lkKblrZjlnKhcbmFjdGl2YXRlIG15c3FsXG5cbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnueUqOaIt-S_oeaBr1xuZGVhY3RpdmF0ZSBteXNxbFxuXG5ybm90ZSBvdmVyIHNlcnZpY2VcbuWvhueggeagoemqjFxuZW5kcm5vdGVcbnJub3RlIG92ZXIgc2VydmljZVxu55Sf5oiQc2Vzc2lvbklEXG5lbmRybm90ZVxuc2VydmljZSAtPiByZWRpczog57yT5a2Yc2Vzc2lvbklE5ZKM55So5oi35L-h5oGvXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHJlZGlzXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5kZWFjdGl2YXRlIHNlcnZpY2Vcblxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lpITnkIbnu5PmnpxcbmVuZHJub3RlXG5cbmNvbnRyb2xsZXIgLT4gd2ViOiBodHRwIHJlc3BvbnNlXG5cblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC81NTA4NjlkOWM0NTM3NDhmMWI0NmU1YTA1MzNmM2UxOC5zdmciLCJpZCI6ImRIQ2k4IiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="boHMv"></a>
 ### 登出
@@ -144,11 +144,13 @@
 | password | string | 密码<br />长度限制：[4,13] |
 
 ```json
+// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data": ""
 }
+// fail
 {
     "errCode":"6",
     "errMsg":"InvalidParamsError",
@@ -171,11 +173,13 @@
 | sessionID | string | 设置在set-cookie中返回 |
 
 ```json
+// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":""
 }
+// fail
 {
     "errCode":"5",
     "errMsg":"PasswordError",
@@ -191,11 +195,13 @@
 | sessionID | string | 从cookie中获取 |
 
 ```json
+// success
 {
   "errCode":"7",
   "errMsg":"success",
   "data":""
 }
+// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
@@ -203,8 +209,10 @@
 }
 ```
 <a name="GbzKu"></a>
+### <br />
+<a name="hRbLv"></a>
 ### 查看用户信息
-**GET  api/entrytask/user/get_user_info**<br />**入参**
+**GET  api/entrytask/user/get_user_info **<br />**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
@@ -219,6 +227,7 @@
 | profilePath | string | 图片路径 |
 
 ```json
+// success
 {
   "errCode":"7",
   "errMsg":"success",
@@ -228,6 +237,7 @@
     "profilePath":"test-2022-08-01.jpg",
   }
 }
+// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
@@ -251,6 +261,7 @@
 | profilePath | string | 图片路径 |
 
 ```json
+// success
 {
     "errCode":"7",
     "errMsg":"success",
@@ -258,6 +269,7 @@
         "profilePath":"test-2022-08-01.jpg"
     }
 }
+// fail
 {
     "errCode":"2",
     "errMsg":"InvalidParamsError",
@@ -280,11 +292,13 @@
 | nickname | string | 昵称 |
 
 ```json
+// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":"xxxxx"
 }
+// fail
 {
     "errCode":"0",
     "errMsg":"ServerError",
