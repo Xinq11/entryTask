@@ -7,7 +7,6 @@ import (
 	"EntryTask/rpc/codec"
 	"EntryTask/rpc/network"
 	"EntryTask/rpc/rpcEntity"
-	"github.com/sirupsen/logrus"
 	"net"
 )
 
@@ -22,9 +21,7 @@ func MakeClient(addr string) {
 	for i := 0; i < config.ConnNum; i++ {
 		conn, err := net.Dial("tcp", addr)
 		if err != nil {
-			logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
 			logger.Error("rpcClient.MakeClient net dial error: " + err.Error())
-			//logrus.Error("rpcClient.MakeClient net dial error: ", err.Error())
 		}
 		connPool <- conn
 	}
