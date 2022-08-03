@@ -71,6 +71,8 @@
 │   │   └── rpcCodec.go
 │   ├── network
 │   │   └── transport.go
+│   ├── pool
+│   │   └── tcpPool.go
 │   ├── rpcEntity
 │   │   ├── rpcRequest.go
 │   │   └── rpcResponse.go
@@ -120,7 +122,11 @@
 **client**：RPC客户端，用于发起rpc调用<br />**server**：RPC服务端，监听端口，接收rpc调用，并根据服务名称选择服务进行处理<br />**service**：RPC具体服务，根据rpc调用请求的方法名称，利用反射调用本地方法得到结果
 <a name="SJToI"></a>
 #### 流程图
-![](https://cdn.nlark.com/yuque/__puml/c5d52f992e5fb2d20f04d7bd58e8c11d.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcImNvbnRyb2xsZXJcIiBhcyBjb250cm9sbGVyXG5wYXJ0aWNpcGFudCBcIlJQQyBDbGllbnRcIiBhcyBjbGllbnRcbnBhcnRpY2lwYW50IFwiUlBDIFNlcnZlclwiIGFzIHNlcnZlclxucGFydGljaXBhbnQgXCJSUEMgU2VydmljZVwiIGFzIHN2Y1xucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxuXG5jbGllbnQgLT4gY2xpZW50OiBNYWtlQ2xpZW50XG5ybm90ZSBvdmVyIGNsaWVudFxuTWFrZUNsaWVudFxu5Yib5bu6dGNw6L-e5o6l5rGgXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiAgc2VydmVyOiBNYWtlU2VydmVyXG5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbk1ha2VTZXJ2ZXJcbuWIm-W7unNlcnZpY2VOYW1l5ZKMc2VydmljZeaYoOWwhOihqFxuZW5kcm5vdGVcblxuc3ZjIC0-IHN2YzogTWFrZVNlcnZpY2VcbnJub3RlIG92ZXIgc3ZjXG5NYWtlU2VydmljZVxu5Yib5bu6bWV0aG9kTmFtZeWSjG1ldGhvZOaYoOWwhOihqFxuZW5kcm5vdGVcblxuc2VydmVyIC0-IHN2YzogcmVnaXN0ZXJcbnJub3RlIG92ZXIgc3ZjXG7lsIZzZXJ2aWNl5re75Yqg5Yiwc2VydmVy55qE5pig5bCE6KGo5LitXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiBzZXJ2ZXI6IEFjY2VwdFxcbuebkeWQrOerr-WPo1xuYWN0aXZhdGUgc2VydmVyXG5cblxuXG5jb250cm9sbGVyIC0-IGNsaWVudDog6LCD55SoY2xpZW50LmNhbGwg5Y-R6LW3cnBj6LCD55SoXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5hY3RpdmF0ZSBjbGllbnRcblxucm5vdGUgb3ZlciBjbGllbnRcbuW6j-WIl-WMllxuZW5kcm5vdGVcblxuY2xpZW50IC0-IHNlcnZlcjogdGNwIGNvbm5lY3QgLi4uLi5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWPjeW6j-WIl-WMllxuZW5kcm5vdGVcblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEc2VydmljZU5hbWVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBzdmM6IOmAieaLqXNlcnZpY2VcbmFjdGl2YXRlIHN2Y1xucm5vdGUgb3ZlciBzdmNcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEbWV0aG9kTmFtZVxuZW5kcm5vdGVcblxuc3ZjIC0-IHNlcnZpY2U6IOWPjeWwhOiwg-eUqOacrOWcsOaWueazlVxuYWN0aXZhdGUgc2VydmljZVxuc2VydmljZSAtPiBzdmM6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5zdmMgLT4gc2VydmVyOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgc3ZjXG5cbnJub3RlIG92ZXIgc2VydmVyXG7luo_liJfljJZcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBjbGllbnQ6IHRjcCBjb25uZWN0IC4uLi4uXG5cblxucm5vdGUgb3ZlciBjbGllbnRcbuWPjeW6j-WIl-WMllxuZW5kcm5vdGVcbmNsaWVudC0-Y29udHJvbGxlcjog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIGNsaWVudFxuZGVhY3RpdmF0ZSBjb250cm9sbGVyXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sL2M1ZDUyZjk5MmU1ZmIyZDIwZjA0ZDdiZDU4ZThjMTFkLnN2ZyIsImlkIjoiVkV3QjkiLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)<a name="Eaot8"></a>
+![](https://cdn.nlark.com/yuque/__puml/f980229e16185219e154575ec149d32a.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcImNvbnRyb2xsZXJcIiBhcyBjb250cm9sbGVyXG5wYXJ0aWNpcGFudCBcIlJQQyBDbGllbnRcIiBhcyBjbGllbnRcbnBhcnRpY2lwYW50IFwiUlBDIFNlcnZlclwiIGFzIHNlcnZlclxucGFydGljaXBhbnQgXCJSUEMgU2VydmljZVwiIGFzIHN2Y1xucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxuXG5jbGllbnQgLT4gY2xpZW50OiBNYWtlQ2xpZW50XG5ybm90ZSBvdmVyIGNsaWVudFxuTWFrZUNsaWVudFxu5Yib5bu6dGNw6L-e5o6l5rGgXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiAgc2VydmVyOiBNYWtlU2VydmVyXG5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbk1ha2VTZXJ2ZXJcbuWIm-W7unNlcnZpY2VOYW1l5ZKMc2VydmljZeaYoOWwhOihqFxuZW5kcm5vdGVcblxuc3ZjIC0-IHN2YzogTWFrZVNlcnZpY2VcbnJub3RlIG92ZXIgc3ZjXG5NYWtlU2VydmljZVxu5Yib5bu6bWV0aG9kTmFtZeWSjG1ldGhvZOaYoOWwhOihqFxuZW5kcm5vdGVcblxuc2VydmVyIC0-IHN2YzogcmVnaXN0ZXJcbnJub3RlIG92ZXIgc3ZjXG7lsIZzZXJ2aWNl5re75Yqg5Yiwc2VydmVy55qE5pig5bCE6KGo5LitXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiBzZXJ2ZXI6IEFjY2VwdFxcbuebkeWQrOerr-WPo1xuYWN0aXZhdGUgc2VydmVyXG5cblxuXG5jb250cm9sbGVyIC0-IGNsaWVudDog6LCD55SoY2xpZW50LmNhbGwg5Y-R6LW3cnBj6LCD55SoXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5hY3RpdmF0ZSBjbGllbnRcblxucm5vdGUgb3ZlciBjbGllbnRcbuiOt-WPlnRjcOi_nuaOpVxuZW5kcm5vdGVcblxucm5vdGUgb3ZlciBjbGllbnRcbuW6j-WIl-WMllxuZW5kcm5vdGVcblxuY2xpZW50IDwtPiBzZXJ2ZXI6IHRjcCBjb25uZWN0IC4uLi4uXG5cbnJub3RlIG92ZXIgc2VydmVyXG7lj43luo_liJfljJZcbmVuZHJub3RlXG5cbnJub3RlIG92ZXIgc2VydmVyXG7liKTmlq1tYXDkuK3mmK_lkKbljIXlkKtcbuivt-axgueahHNlcnZpY2VOYW1lXG5lbmRybm90ZVxuXG5zZXJ2ZXIgLT4gc3ZjOiDpgInmi6lzZXJ2aWNlXG5hY3RpdmF0ZSBzdmNcbnJub3RlIG92ZXIgc3ZjXG7liKTmlq1tYXDkuK3mmK_lkKbljIXlkKtcbuivt-axgueahG1ldGhvZE5hbWVcbmVuZHJub3RlXG5cbnN2YyAtPiBzZXJ2aWNlOiDlj43lsITosIPnlKjmnKzlnLDmlrnms5VcbmFjdGl2YXRlIHNlcnZpY2VcbnNlcnZpY2UgLT4gc3ZjOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgc2VydmljZVxuc3ZjIC0-IHNlcnZlcjog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHN2Y1xuXG5ybm90ZSBvdmVyIHNlcnZlclxu5bqP5YiX5YyWXG5lbmRybm90ZVxuXG5zZXJ2ZXIgPC0-IGNsaWVudDogdGNwIGNvbm5lY3QgLi4uLi5cblxuXG5ybm90ZSBvdmVyIGNsaWVudFxu5Y-N5bqP5YiX5YyWXG5lbmRybm90ZVxuXG5ybm90ZSBvdmVyIGNsaWVudFxu6YeK5pS-dGNw6L-e5o6lXG5lbmRybm90ZVxuXG5jbGllbnQtPmNvbnRyb2xsZXI6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBjbGllbnRcbmRlYWN0aXZhdGUgY29udHJvbGxlclxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC9mOTgwMjI5ZTE2MTg1MjE5ZTE1NDU3NWVjMTQ5ZDMyYS5zdmciLCJpZCI6IlZFd0I5IiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="bVxEr"></a>
+#### tcp连接池
+**获取连接**
+![](https://cdn.nlark.com/yuque/__puml/1fc4777a6adf8c73c8b1dc79f866c198.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuc3RhcnRcblxuOmdldCBjb25uZWN0aW9uO1xuXG5pZiAo5a2Y5Zyo56m66Zey6L-e5o6lKSB0aGVuICh0cnVlKVxuICA6cmV0dXJuO1xuXHRlbmRcbmVsc2UgKGZhbHNlKVxuICBpZiAo5b2T5YmN6L-e5o6l5pWw5aSn5LqO5pyA5aSn6L-e5o6l5pWwKSB0aGVuICh0cnVlKVxuXHRcdFx0OumYu-Whnjtcblx0XHRcdGVuZFxuXHRlbHNlIChmYWxzZSlcblx0XHRcdDrliJvlu7rmlrDov57mjqU7XG5cdFx0XHRlbmRcblx0ZW5kaWZcbmVuZGlmXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC8xZmM0Nzc3YTZhZGY4YzczYzhiMWRjNzlmODY2YzE5OC5zdmciLCJpZCI6IlFsNHlMIiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)**释放连接**
+![](https://cdn.nlark.com/yuque/__puml/e0b597b88a46de9e97bc85e9e565c699.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuc3RhcnRcblxuOnJlbGVhc2UgY29ubmVjdGlvbjtcblxuaWYgKOWtmOWcqOmYu-WhnuetieW-hei_nuaOpemHiuaUvikgdGhlbiAodHJ1ZSlcbiAgOui_nuaOpeWkjeeUqDtcbiAgZW5kXG5lbHNlIChmYWxzZSlcbiAgaWYgKOW9k-WJjei_nuaOpeaVsOWkp-S6juacgOWkp-i_nuaOpeaVsHx856m66Zey6L-e5o6l5rGg5bey5ruhKSB0aGVuICh0cnVlKVxuXHRcdDrlhbPpl63ov57mjqU7XG5cdFx0ZW5kXG5cdGVsc2UgKGZhbHNlKVxuXHRcdDrmlL7lm57nqbrpl7Lov57mjqXmsaA7XG4gIGVuZFxuZW5kaWZcblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC9lMGI1OTdiODhhNDZkZTllOTdiYzg1ZTllNTY1YzY5OS5zdmciLCJpZCI6IldTRFFhIiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="Eaot8"></a>
 #### 传输协议
 设置固定字节长度来存放数据长度
 <a name="W5L88"></a>
@@ -208,7 +214,7 @@
 ```
 <a name="hRbLv"></a>
 ### 查看用户信息
-**GET  api/entrytask/user/get_user_info**<br />**入参**
+**GET  api/entrytask/user/get_user_info **<br />**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
@@ -355,7 +361,7 @@ go build httpServer.go
 
 - 200固定用户 qps大于3000    压测结果均值10000左右
 ```shell
-wrk -c200 -t8 -d120s -s benchmark/getUserInfo.lua  -H "Cookie: sessionID=0f9f2699-27ed-34f4-be25-b1de0d024c1f" --latency http://localhost:9090/api/entrytask/user/get_user_info 
+wrk -c200 -t8 -d120s -s benchmark/getUserInfo.lua  -H "Cookie: sessionID=5fb4c437-8310-35fb-848c-8985461f762f" --latency http://localhost:9090/api/entrytask/user/get_user_info 
 ```
 ![固定 200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659458763234-2ff09473-6b58-4732-9e91-a6bbfee105f1.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=u086d2221&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A%20200.png&originHeight=760&originWidth=3336&originalType=binary&ratio=1&rotation=0&showTitle=false&size=187098&status=done&style=none&taskId=ucd81811d-f636-4f81-81d9-874aef24439&title=)
 
@@ -365,20 +371,20 @@ wrk -c2000 -t8 -d120s -s benchmark/getUserInfo.lua -H "Cookie: sessionID=a73fd78
 ```
 ![固定 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659458774991-58f41dfc-f8b7-4e9a-b178-88b671e5ec01.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=u9210e18c&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A%202000.png&originHeight=756&originWidth=3304&originalType=binary&ratio=1&rotation=0&showTitle=false&size=184884&status=done&style=none&taskId=u6dcb4255-40c9-4d8c-b525-85b9da68999&title=)
 
-- 200随机用户 qps大于1000    压测结果均值5000左右 
+- 200随机用户 qps大于1000    压测结果均值6000左右 
 ```shell
 wrk -c200 -t8 -d120s -s benchmark/signIn.lua --latency http://localhost:9090/api/entrytask/user/signin
 ```
-![随机 200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659459312854-9b23b2e7-661f-43c2-ba98-8ad0fa9c2770.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=ub89f63c5&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%20200.png&originHeight=748&originWidth=2228&originalType=binary&ratio=1&rotation=0&showTitle=false&size=159573&status=done&style=none&taskId=u9e243e02-fe33-482b-8739-fde253efdc2&title=)
+![随机 200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659521017147-1c9348e6-a136-4195-8ecb-802bb7b115d8.png#clientId=ubff15b93-6bb8-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=u527d4cad&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%20200.png&originHeight=750&originWidth=2158&originalType=binary&ratio=1&rotation=0&showTitle=false&size=157505&status=done&style=none&taskId=u77ca23b6-172b-4403-adb4-950de917097&title=)
 
-- 2000随机用户 qps大于800    压测结果均值3500左右
+- 2000随机用户 qps大于800    压测结果均值5000左右
 ```shell
 wrk -c2000 -t8 -d120s -s benchmark/signIn.lua --latency http://localhost:9090/api/entrytask/user/signin
 ```
-![随机 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659462183139-f6db1eb7-680c-4fcb-b224-ee59bc2513b2.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=uf2594552&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%202000.png&originHeight=748&originWidth=2160&originalType=binary&ratio=1&rotation=0&showTitle=false&size=158226&status=done&style=none&taskId=u50188d76-357b-4b80-ab6e-eb3c1ad7f6a&title=)
+![随机 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659521060519-ef9918e2-a0ab-43dc-870e-376dd1e9e06e.png#clientId=ubff15b93-6bb8-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=uaa6f4ea6&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%202000.png&originHeight=760&originWidth=2174&originalType=binary&ratio=1&rotation=0&showTitle=false&size=158299&status=done&style=none&taskId=u47fd536c-8842-44c3-a735-ef55f892ff2&title=)
 <a name="tmhcV"></a>
 ## **九、遗留问题与风险预估**
-接口设计存在冗余，可以简化<br />rpc动态代理，连接池优化
+接口设计存在冗余，可以简化<br />rpc动态代理，超时处理
 
 <a name="AvVRu"></a>
 ## **十、附录**
