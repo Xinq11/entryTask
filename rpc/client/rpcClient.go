@@ -10,7 +10,7 @@ import (
 )
 
 type RpcClient struct {
-	connPool *pool.Pool
+	ConnPool *pool.Pool
 }
 
 var Client *RpcClient
@@ -20,18 +20,18 @@ func MakeClient(addr string) error {
 	if err != nil {
 		return err
 	}
-	Client = &RpcClient{connPool: pool}
+	Client = &RpcClient{ConnPool: pool}
 	return nil
 }
 
 // 发起远程过程调用
 func (client *RpcClient) Call(methodName string, args interface{}) rpcEntity.RpcResponse {
-	conn, err := client.connPool.GetConn()
+	conn, err := client.ConnPool.GetConn()
 	if err != nil {
 		logger.Error("rpcClient.Call GetConn error: " + err.Error())
 		return rpcEntity.RpcResponse{ErrCode: constant.ServerError}
 	}
-	defer client.connPool.ReleaseConn(conn)
+	defer client.ConnPool.ReleaseConn(conn)
 	request := rpcEntity.RpcRequest{
 		MethodName: methodName,
 		Args:       args,

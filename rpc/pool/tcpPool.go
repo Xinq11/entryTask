@@ -97,3 +97,11 @@ func (pool *Pool) ReleaseConn(conn net.Conn) {
 		return
 	}
 }
+
+// 关闭连接
+func (pool *Pool) CloseFreeConn() {
+	logger.Info("tcpPool.CloseFreeConn close conn...")
+	for _, conn := range pool.freeConn {
+		conn.Close()
+	}
+}

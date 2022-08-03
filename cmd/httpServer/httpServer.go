@@ -4,10 +4,12 @@ import (
 	"EntryTask/config"
 	"EntryTask/internal/controller"
 	"EntryTask/logger"
-	"EntryTask/rpc/client"
+	rpcClient "EntryTask/rpc/client"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
+	"os/signal"
 )
 
 // 路由
@@ -24,16 +26,25 @@ func main() {
 	// 初始化日志
 	logger.Init()
 	// 初始化RPC Client
-	err := client.MakeClient(config.RpcAddr)
+	err := rpcClient.MakeClient(config.RpcAddr)
 	if err != nil {
 		logrus.Panic("HttpServer MakeClient error: ", err.Error())
 	}
 	// 启动HTTP Server
 	route()
+	go func() {
+		err = http.ListenAndServe(":9090", nil) // 设置监听的端口
+		if err != nil {
+			logrus.Panic("HttpServer ListenAndServe error: ", err.Error())
+		}
+	}()
 	logrus.Infoln("httpserver start...")
-	err = http.ListenAndServe(":9090", nil) // 设置监听的端口
-	if err != nil {
-		logrus.Panic("HttpServer ListenAndServe error: ", err.Error())
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	for {
+		<-c
+		logrus.Info("httpServer shutdown")
+		rpcClient.Client.ConnPool.CloseFreeConn()
+		return
 	}
-	logrus.Panic("over", err.Error())
 }
