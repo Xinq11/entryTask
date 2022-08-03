@@ -361,7 +361,7 @@ wrk -c200 -t8 -d120s -s benchmark/getUserInfo.lua  -H "Cookie: sessionID=0f9f269
 
 - 2000固定用户 qps大于1500    压测结果均值7000左右   
 ```shell
-wrk -c2000 -t8 -d60s -s benchmark/getUserInfo.lua -H "Cookie: sessionID=a73fd784-c132-3963-84bf-ba586b98a6a9" --latency http://localhost:9090/api/entrytask/user/get_user_info
+wrk -c2000 -t8 -d120s -s benchmark/getUserInfo.lua -H "Cookie: sessionID=a73fd784-c132-3963-84bf-ba586b98a6a9" --latency http://localhost:9090/api/entrytask/user/get_user_info
 ```
 ![固定 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659458774991-58f41dfc-f8b7-4e9a-b178-88b671e5ec01.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=u9210e18c&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A%202000.png&originHeight=756&originWidth=3304&originalType=binary&ratio=1&rotation=0&showTitle=false&size=184884&status=done&style=none&taskId=u6dcb4255-40c9-4d8c-b525-85b9da68999&title=)
 
