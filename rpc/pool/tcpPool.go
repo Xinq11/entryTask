@@ -35,13 +35,13 @@ func Init(addr string) (*Pool, error) {
 // 获取连接
 func (pool *Pool) GetConn() (net.Conn, error) {
 	pool.mu.Lock()
-	numFree := len(pool.freeConn)
+	lenFreeConn := len(pool.freeConn)
 	// 如果有空闲连接 则返回
-	if numFree != 0 {
+	if lenFreeConn != 0 {
 		logger.Info("tcpPool.GetConn get conn from pool...")
 		// 取出切片中的第一个连接 截取数组
 		conn := pool.freeConn[0]
-		pool.freeConn = pool.freeConn[1:numFree]
+		pool.freeConn = pool.freeConn[1:lenFreeConn]
 		pool.mu.Unlock()
 		return conn, nil
 	}
