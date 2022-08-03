@@ -1,4 +1,3 @@
-<a name="ibxlh"></a>
 ## **一、背景及目的**
 - 让团队更好地了解新人对技能的掌握情况
 - 熟悉简单的Web API后台架构
@@ -9,15 +8,11 @@
 - 对任务进度和时间有所意识
 - 对代码规范、测试、文档、性能调优需要有所意识
 
-<a name="EpNKW"></a>
 ## **二、逻辑架构设计**
-<a name="vvESq"></a>
 ### 系统架构图
 ![](https://cdn.nlark.com/yuque/0/2022/jpeg/21719644/1658470040023-de40819d-5d6a-4ec6-ab0e-bdb1c83f1099.jpeg)
-<a name="ORSG3"></a>
 ### 页面转换
 ![](https://cdn.nlark.com/yuque/0/2022/jpeg/21719644/1658893344577-8f986f11-a1a9-431c-ba27-fbfa2d877669.jpeg)
-<a name="BCBXT"></a>
 ### 目录结构
 ```shell
 .
@@ -36,8 +31,8 @@
 ├── constant
 │   └── errCodeEnum.go
 ├── database
-│   ├── MySqlPool.go
-│   └── RedisPool.go
+│   ├── mySqlPool.go
+│   └── redisPool.go
 ├── go.mod
 ├── go.sum
 ├── img
@@ -84,44 +79,34 @@
     └── userInfo.html
 
 ```
-<a name="r57di"></a>
 ## **三、核心逻辑详细设计**
-<a name="iJrpz"></a>
 ### 注册流程
-![](https://cdn.nlark.com/yuque/__puml/5b4d215a31e517a5df3d9445a36d0b04.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmn6XnnIvnlKjmiLfmmK_lkKblrZjlnKhcbmFjdGl2YXRlIG15c3FsXG5cbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnueUqOaIt-S_oeaBr1xucm5vdGUgb3ZlciBzZXJ2aWNlXG7lr4bnoIHliqDlr4ZcbmVuZHJub3RlXG5cbnNlcnZpY2UgLT4gbXlzcWw6IOWtmOWCqOeUqOaIt-S_oeaBr1xubXlzcWwgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIG15c3FsXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5kZWFjdGl2YXRlIHNlcnZpY2Vcblxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lpITnkIbnu5PmnpxcbmVuZHJub3RlXG5cbmNvbnRyb2xsZXIgLT4gd2ViOiBodHRwIHJlc3BvbnNlXG5cblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC81YjRkMjE1YTMxZTUxN2E1ZGYzZDk0NDVhMzZkMGIwNC5zdmciLCJpZCI6IktLOUtSIiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="HQIEL"></a>
-### 登录流程
-![](https://cdn.nlark.com/yuque/__puml/550869d9c453748f1b46e5a0533f3e18.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmn6XnnIvnlKjmiLfmmK_lkKblrZjlnKhcbmFjdGl2YXRlIG15c3FsXG5cbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnueUqOaIt-S_oeaBr1xuZGVhY3RpdmF0ZSBteXNxbFxuXG5ybm90ZSBvdmVyIHNlcnZpY2VcbuWvhueggeagoemqjFxuZW5kcm5vdGVcbnJub3RlIG92ZXIgc2VydmljZVxu55Sf5oiQc2Vzc2lvbklEXG5lbmRybm90ZVxuc2VydmljZSAtPiByZWRpczog57yT5a2Yc2Vzc2lvbklE5ZKM55So5oi35L-h5oGvXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHJlZGlzXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5kZWFjdGl2YXRlIHNlcnZpY2Vcblxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lpITnkIbnu5PmnpxcbmVuZHJub3RlXG5cbmNvbnRyb2xsZXIgLT4gd2ViOiBodHRwIHJlc3BvbnNlXG5cblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC81NTA4NjlkOWM0NTM3NDhmMWI0NmU1YTA1MzNmM2UxOC5zdmciLCJpZCI6ImRIQ2k4IiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="boHMv"></a>
-### 登出
-![](https://cdn.nlark.com/yuque/__puml/8cd1b7b882daf91db4cd723c3f6ac130.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IHJlZGlzOiDliKDpmaRzZXNzaW9uSURcbmFjdGl2YXRlIHJlZGlzXG5cbnJlZGlzIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSByZWRpc1xuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvOGNkMWI3Yjg4MmRhZjkxZGI0Y2Q3MjNjM2Y2YWMxMzAuc3ZnIiwiaWQiOiJZWWVwVyIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)<a name="XvW7B"></a>
-### 查看用户信息流程
-![](https://cdn.nlark.com/yuque/__puml/a32aa0e8be8fe64f28b7cfee013d9c44.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IHJlZGlzOiDpqozor4FzZXNzaW9uSURcbmFjdGl2YXRlIHJlZGlzXG5cbnJlZGlzIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSByZWRpc1xuXG5ybm90ZSBvdmVyIHNlcnZpY2VcbnJlZGlz5a2Y5Zyo5YiZ6L-U5Zue5pWw5o2uXG5lbmRybm90ZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmn6Xor6LnlKjmiLfkv6Hmga9cbmFjdGl2YXRlIG15c3FsXG5teXNxbCAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgbXlzcWxcblxuc2VydmljZSAtPiByZWRpczog57yT5a2Y55So5oi35L-h5oGvXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHJlZGlzXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5kZWFjdGl2YXRlIHNlcnZpY2Vcblxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lpITnkIbnu5PmnpxcbmVuZHJub3RlXG5cbmNvbnRyb2xsZXIgLT4gd2ViOiBodHRwIHJlc3BvbnNlXG5cblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC9hMzJhYTBlOGJlOGZlNjRmMjhiN2NmZWUwMTNkOWM0NC5zdmciLCJpZCI6IkRSTzNCIiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="cchy9"></a>
-### 修改头像流程
-![](https://cdn.nlark.com/yuque/__puml/4fcbf41852b62f02d3b24942fde703ed.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbnJub3RlIG92ZXIgY29udHJvbGxlclxu5L-d5a2Y5Zu-54mHXG5lbmRybm90ZVxuYWN0aXZhdGUgY29udHJvbGxlclxuXG5jb250cm9sbGVyIC0-IHNlcnZpY2U6IHJwYyByZXF1ZXN0XG5hY3RpdmF0ZSBzZXJ2aWNlXG5cbnNlcnZpY2UgLT4gcmVkaXM6IOmqjOivgXNlc3Npb25JRFxuYWN0aXZhdGUgcmVkaXNcblxucmVkaXMgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHJlZGlzXG5cblxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmm7TmlrDnlKjmiLfkv6Hmga9cbmFjdGl2YXRlIG15c3FsXG5teXNxbCAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgbXlzcWxcblxuc2VydmljZSAtPiByZWRpczog5Yig6Zmk55So5oi35L-h5oGv57yT5a2YXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHJlZGlzXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5kZWFjdGl2YXRlIHNlcnZpY2Vcblxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lpITnkIbnu5PmnpxcbmVuZHJub3RlXG5cbmNvbnRyb2xsZXIgLT4gd2ViOiBodHRwIHJlc3BvbnNlXG5cblxuXG5AZW5kdW1sIiwidXJsIjoiaHR0cHM6Ly9jZG4ubmxhcmsuY29tL3l1cXVlL19fcHVtbC80ZmNiZjQxODUyYjYyZjAyZDNiMjQ5NDJmZGU3MDNlZC5zdmciLCJpZCI6IlJCSUhDIiwibWFyZ2luIjp7InRvcCI6dHJ1ZSwiYm90dG9tIjp0cnVlfSwiY2FyZCI6ImRpYWdyYW0ifQ==)<a name="ebBA2"></a>
-### 修改昵称流程
-![](https://cdn.nlark.com/yuque/__puml/8c4ef190d3bb1b26ce3817b0a7e0d07a.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJjb250cm9sbGVyXCIgYXMgY29udHJvbGxlclxucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxucGFydGljaXBhbnQgXCJyZWRpc1wiIGFzIHJlZGlzXG5wYXJ0aWNpcGFudCBcIm15c3FsXCIgYXMgbXlzcWxcblxuYWN0aXZhdGUgd2ViXG53ZWIgLT4gY29udHJvbGxlcjogaHR0cCByZXF1ZXN0XG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWPguaVsOagoemqjFxuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IHJlZGlzOiDpqozor4FzZXNzaW9uSURcbmFjdGl2YXRlIHJlZGlzXG5cbnJlZGlzIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSByZWRpc1xuXG5cblxuc2VydmljZSAtPiBteXNxbDog5pu05paw55So5oi35L-h5oGvXG5hY3RpdmF0ZSBteXNxbFxubXlzcWwgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIG15c3FsXG5cbnNlcnZpY2UgLT4gcmVkaXM6IOWIoOmZpOeUqOaIt-S_oeaBr-e8k-WtmFxuYWN0aXZhdGUgcmVkaXNcbnJlZGlzIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSByZWRpc1xuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvOGM0ZWYxOTBkM2JiMWIyNmNlMzgxN2IwYTdlMGQwN2Euc3ZnIiwiaWQiOiJyNElNbyIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)<a name="iFQbi"></a>
-### 鉴权
+![](https://cdn.nlark.com/yuque/__puml/c14c9d1f515c3e1e55480660d79edd88.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJIVFRQIFNlcnZlclwiIGFzIGNvbnRyb2xsZXJcbnBhcnRpY2lwYW50IFwiVENQIFNlcnZlclwiIGFzIHNlcnZpY2VcbnBhcnRpY2lwYW50IFwiUmVkaXNcIiBhcyByZWRpc1xucGFydGljaXBhbnQgXCJNeVNxbFwiIGFzIG15c3FsXG5cbmFjdGl2YXRlIHdlYlxud2ViIC0-IGNvbnRyb2xsZXI6IGh0dHAgcmVxdWVzdFxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lj4LmlbDmoKHpqoxcbmVuZHJub3RlXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5cbmNvbnRyb2xsZXIgLT4gc2VydmljZTogcnBjIHJlcXVlc3RcbmFjdGl2YXRlIHNlcnZpY2Vcblxuc2VydmljZSAtPiBteXNxbDog5p-l55yL55So5oi35piv5ZCm5a2Y5ZyoXG5hY3RpdmF0ZSBteXNxbFxuXG5teXNxbCAtPiBzZXJ2aWNlOiDov5Tlm57nlKjmiLfkv6Hmga9cbmRlYWN0aXZhdGUgbXlzcWxcblxuc2VydmljZSAtPiBjb250cm9sbGVyOiBycGMgcmVzcG9uc2Vcbm5vdGUgcmlnaHRcbueUqOaIt-W3suWtmOWcqFxuZW5kIG5vdGVcblxucm5vdGUgb3ZlciBzZXJ2aWNlXG7lr4bnoIHliqDlr4ZcbmVuZHJub3RlXG5cbnNlcnZpY2UgLT4gbXlzcWw6IOWtmOWCqOeUqOaIt-S_oeaBr1xuYWN0aXZhdGUgbXlzcWxcbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBteXNxbFxuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvYzE0YzlkMWY1MTVjM2UxZTU1NDgwNjYwZDc5ZWRkODguc3ZnIiwiaWQiOiJLSzlLUiIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)### 登录流程
+![](https://cdn.nlark.com/yuque/__puml/82eacce7974f2d297c77a4e587eae9b3.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJIVFRQIFNlcnZlclwiIGFzIGNvbnRyb2xsZXJcbnBhcnRpY2lwYW50IFwiVENQIFNlcnZlclwiIGFzIHNlcnZpY2VcbnBhcnRpY2lwYW50IFwiUmVkaXNcIiBhcyByZWRpc1xucGFydGljaXBhbnQgXCJNeVNxbFwiIGFzIG15c3FsXG5cbmFjdGl2YXRlIHdlYlxud2ViIC0-IGNvbnRyb2xsZXI6IGh0dHAgcmVxdWVzdFxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lj4LmlbDmoKHpqoxcbmVuZHJub3RlXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5cbmNvbnRyb2xsZXIgLT4gc2VydmljZTogcnBjIHJlcXVlc3RcbmFjdGl2YXRlIHNlcnZpY2Vcblxuc2VydmljZSAtPiBteXNxbDog5p-l55yL55So5oi35piv5ZCm5a2Y5ZyoXG5hY3RpdmF0ZSBteXNxbFxuXG5teXNxbCAtPiBzZXJ2aWNlOiDov5Tlm57nlKjmiLfkv6Hmga9cbmRlYWN0aXZhdGUgbXlzcWxcblxuc2VydmljZSAtPiBjb250cm9sbGVyOiBycGMgcmVzcG9uc2Vcbm5vdGUgcmlnaHRcbueUqOaIt-S4jeWtmOWcqFxuZW5kIG5vdGVcblxucm5vdGUgb3ZlciBzZXJ2aWNlXG7lr4bnoIHmoKHpqoxcbmVuZHJub3RlXG5ybm90ZSBvdmVyIHNlcnZpY2VcbueUn-aIkHNlc3Npb25JRFxuZW5kcm5vdGVcbnNlcnZpY2UgLT4gcmVkaXM6IOe8k-WtmHNlc3Npb25JROWSjOeUqOaIt-S_oeaBr1xuYWN0aXZhdGUgcmVkaXNcbnJlZGlzIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSByZWRpc1xuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvODJlYWNjZTc5NzRmMmQyOTdjNzdhNGU1ODdlYWU5YjMuc3ZnIiwiaWQiOiJkSENpOCIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)### 登出
+![](https://cdn.nlark.com/yuque/__puml/7492e33a7a93aef0cdfd33fc810bc127.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJIVFRQIFNlcnZlclwiIGFzIGNvbnRyb2xsZXJcbnBhcnRpY2lwYW50IFwiVENQIFNlcnZlclwiIGFzIHNlcnZpY2VcbnBhcnRpY2lwYW50IFwiUmVkaXNcIiBhcyByZWRpc1xucGFydGljaXBhbnQgXCJNeVNxbFwiIGFzIG15c3FsXG5cbmFjdGl2YXRlIHdlYlxud2ViIC0-IGNvbnRyb2xsZXI6IGh0dHAgcmVxdWVzdFxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lj4LmlbDmoKHpqoxcbmVuZHJub3RlXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5cbmNvbnRyb2xsZXIgLT4gc2VydmljZTogcnBjIHJlcXVlc3RcbmFjdGl2YXRlIHNlcnZpY2Vcblxuc2VydmljZSAtPiByZWRpczog5Yig6Zmkc2Vzc2lvbklEXG5hY3RpdmF0ZSByZWRpc1xuXG5yZWRpcyAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgcmVkaXNcblxuc2VydmljZSAtPiBjb250cm9sbGVyOiBycGMgcmVzcG9uc2VcbmRlYWN0aXZhdGUgc2VydmljZVxuXG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWkhOeQhue7k-aenFxuZW5kcm5vdGVcblxuY29udHJvbGxlciAtPiB3ZWI6IGh0dHAgcmVzcG9uc2VcblxuXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sLzc0OTJlMzNhN2E5M2FlZjBjZGZkMzNmYzgxMGJjMTI3LnN2ZyIsImlkIjoiWVllcFciLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)### 查看用户信息流程
+![](https://cdn.nlark.com/yuque/__puml/abb92c2dd0ae336a382e5a48fa56773b.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJIVFRQIFNlcnZlclwiIGFzIGNvbnRyb2xsZXJcbnBhcnRpY2lwYW50IFwiVENQIFNlcnZlclwiIGFzIHNlcnZpY2VcbnBhcnRpY2lwYW50IFwiUmVkaXNcIiBhcyByZWRpc1xucGFydGljaXBhbnQgXCJNeVNxbFwiIGFzIG15c3FsXG5cbmFjdGl2YXRlIHdlYlxud2ViIC0-IGNvbnRyb2xsZXI6IGh0dHAgcmVxdWVzdFxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lj4LmlbDmoKHpqoxcbmVuZHJub3RlXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5cbmNvbnRyb2xsZXIgLT4gc2VydmljZTogcnBjIHJlcXVlc3RcbmFjdGl2YXRlIHNlcnZpY2Vcblxuc2VydmljZSAtPiByZWRpczog6aqM6K-Bc2Vzc2lvbklEXG5hY3RpdmF0ZSByZWRpc1xuXG5yZWRpcyAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgcmVkaXNcblxuc2VydmljZSAtPiBjb250cm9sbGVyOiBycGMgcmVzcG9uc2Vcbm5vdGUgcmlnaHRcbnNlc3Npb25JROS4jeWtmOWcqFxuZW5kIG5vdGVcblxuc2VydmljZSAtPiByZWRpczog5p-l6K-i57yT5a2YXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gc2VydmljZTog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIHJlZGlzXG5cbnNlcnZpY2UgLT4gY29udHJvbGxlcjogcnBjIHJlc3BvbnNlXG5ub3RlIHJpZ2h0XG7mnInnvJPlrZjliJnov5Tlm57mlbDmja5cbmVuZCBub3RlXG5cbnNlcnZpY2UgLT4gbXlzcWw6IOafpeivoueUqOaIt-S_oeaBr1xuYWN0aXZhdGUgbXlzcWxcbm15c3FsIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBteXNxbFxuXG5zZXJ2aWNlIC0-IHJlZGlzOiDnvJPlrZjnlKjmiLfkv6Hmga9cbmFjdGl2YXRlIHJlZGlzXG5yZWRpcyAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgcmVkaXNcblxuc2VydmljZSAtPiBjb250cm9sbGVyOiBycGMgcmVzcG9uc2VcbmRlYWN0aXZhdGUgc2VydmljZVxuXG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuWkhOeQhue7k-aenFxuZW5kcm5vdGVcblxuY29udHJvbGxlciAtPiB3ZWI6IGh0dHAgcmVzcG9uc2VcblxuXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sL2FiYjkyYzJkZDBhZTMzNmEzODJlNWE0OGZhNTY3NzNiLnN2ZyIsImlkIjoiRFJPM0IiLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)### 修改头像流程
+![](https://cdn.nlark.com/yuque/__puml/b59cd676e46ab602bd6d7393f6ef4c44.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJIVFRQIFNlcnZlclwiIGFzIGNvbnRyb2xsZXJcbnBhcnRpY2lwYW50IFwiVENQIFNlcnZlclwiIGFzIHNlcnZpY2VcbnBhcnRpY2lwYW50IFwiUmVkaXNcIiBhcyByZWRpc1xucGFydGljaXBhbnQgXCJNeVNxbFwiIGFzIG15c3FsXG5cbmFjdGl2YXRlIHdlYlxud2ViIC0-IGNvbnRyb2xsZXI6IGh0dHAgcmVxdWVzdFxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lj4LmlbDmoKHpqoxcbmVuZHJub3RlXG5ybm90ZSBvdmVyIGNvbnRyb2xsZXJcbuS_neWtmOWbvueJh1xuZW5kcm5vdGVcbmFjdGl2YXRlIGNvbnRyb2xsZXJcblxuY29udHJvbGxlciAtPiBzZXJ2aWNlOiBycGMgcmVxdWVzdFxuYWN0aXZhdGUgc2VydmljZVxuXG5zZXJ2aWNlIC0-IHJlZGlzOiDpqozor4FzZXNzaW9uSURcbmFjdGl2YXRlIHJlZGlzXG5cbnJlZGlzIC0-IHNlcnZpY2U6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSByZWRpc1xuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxubm90ZSByaWdodFxuc2Vzc2lvbklE5LiN5a2Y5ZyoXG5lbmQgbm90ZVxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmm7TmlrDnlKjmiLfkv6Hmga9cbmFjdGl2YXRlIG15c3FsXG5teXNxbCAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgbXlzcWxcblxuc2VydmljZSAtPiByZWRpczog5Yig6Zmk55So5oi35L-h5oGv57yT5a2YXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gcmVkaXM6IOWksei0pemHjeivlVxuZGVhY3RpdmF0ZSByZWRpc1xuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvYjU5Y2Q2NzZlNDZhYjYwMmJkNmQ3MzkzZjZlZjRjNDQuc3ZnIiwiaWQiOiJSQklIQyIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)### 修改昵称流程
+![](https://cdn.nlark.com/yuque/__puml/7bc07e5d028dd20f38aeb370e0ff6dbd.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcIua1j-iniOWZqFwiIGFzIHdlYlxucGFydGljaXBhbnQgXCJIVFRQIFNlcnZlclwiIGFzIGNvbnRyb2xsZXJcbnBhcnRpY2lwYW50IFwiVENQIFNlcnZlclwiIGFzIHNlcnZpY2VcbnBhcnRpY2lwYW50IFwiUmVkaXNcIiBhcyByZWRpc1xucGFydGljaXBhbnQgXCJNeVNxbFwiIGFzIG15c3FsXG5cbmFjdGl2YXRlIHdlYlxud2ViIC0-IGNvbnRyb2xsZXI6IGh0dHAgcmVxdWVzdFxucm5vdGUgb3ZlciBjb250cm9sbGVyXG7lj4LmlbDmoKHpqoxcbmVuZHJub3RlXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5cbmNvbnRyb2xsZXIgLT4gc2VydmljZTogcnBjIHJlcXVlc3RcbmFjdGl2YXRlIHNlcnZpY2Vcblxuc2VydmljZSAtPiByZWRpczog6aqM6K-Bc2Vzc2lvbklEXG5hY3RpdmF0ZSByZWRpc1xuXG5yZWRpcyAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgcmVkaXNcblxuc2VydmljZSAtPiBjb250cm9sbGVyOiBycGMgcmVzcG9uc2Vcbm5vdGUgcmlnaHRcbnNlc3Npb25JROS4jeWtmOWcqFxuZW5kIG5vdGVcblxuXG5zZXJ2aWNlIC0-IG15c3FsOiDmm7TmlrDnlKjmiLfkv6Hmga9cbmFjdGl2YXRlIG15c3FsXG5teXNxbCAtPiBzZXJ2aWNlOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgbXlzcWxcblxuc2VydmljZSAtPiByZWRpczog5Yig6Zmk55So5oi35L-h5oGv57yT5a2YXG5hY3RpdmF0ZSByZWRpc1xucmVkaXMgLT4gcmVkaXM6IOWksei0pemHjeivlVxuZGVhY3RpdmF0ZSByZWRpc1xuXG5zZXJ2aWNlIC0-IGNvbnRyb2xsZXI6IHJwYyByZXNwb25zZVxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5cbnJub3RlIG92ZXIgY29udHJvbGxlclxu5aSE55CG57uT5p6cXG5lbmRybm90ZVxuXG5jb250cm9sbGVyIC0-IHdlYjogaHR0cCByZXNwb25zZVxuXG5cblxuQGVuZHVtbCIsInVybCI6Imh0dHBzOi8vY2RuLm5sYXJrLmNvbS95dXF1ZS9fX3B1bWwvN2JjMDdlNWQwMjhkZDIwZjM4YWViMzcwZTBmZjZkYmQuc3ZnIiwiaWQiOiJyNElNbyIsIm1hcmdpbiI6eyJ0b3AiOnRydWUsImJvdHRvbSI6dHJ1ZX0sImNhcmQiOiJkaWFncmFtIn0=)### 鉴权
 
 - 用户登录后校验用户名密码是否正确，正确则生成sessionID(全局唯一)，并将sessionID - username缓存到redis中(设置过期时间)
 - 将生成的sessionID返回给客户端(set-cookie)，后续每次请求在cookie中携带sessionID
 - 验证sessionID是否过期，如果过期则需要重新登录
-<a name="kjyBR"></a>
-### 密码加密
-| **加密算法** | **加密方式** | **问题** |
-| --- | --- | --- |
-| SHA-256, SHA-1, md5 | 单向hash | 易破解 |
-| salt | 密码先进行一次 MD5（或其它哈希算法）加密；将得到的 MD5 值前后加上随机串，再进行一次 MD5 加密 |  |
-| scrypt |  | 大量内存计算，耗时久 |
+### sessionID生成
 
-<a name="VUHOM"></a>
+1. 根据随机数生成UUID
+1. 将第一步生成的UUID和username进行md5计算生成最终的sessionID
+### 密码加密
+
+- **salt加密**：密码先进行一次 MD5（或其它哈希算法）加密；将得到的 MD5 值前后加上随机串，再进行一次 MD5 加密
 ### RPC
-<a name="PawGC"></a>
 #### 模块划分
-**client**：RPC客户端，用于发起远程服务调用<br />**server**：RPC服务端，用于根据服务名称选择服务，并返回调用结果<br />**service**：RPC具体服务，实现反射处理远程调用具体逻辑，得到本地方法运行结果
-<a name="SJToI"></a>
+**client**：RPC客户端，用于发起rpc调用
+**server**：RPC服务端，监听端口，接收rpc调用，并根据服务名称选择服务进行处理
+**service**：RPC具体服务，根据rpc调用请求的方法名称，利用反射调用本地方法得到结果
 #### 流程图
-![](https://cdn.nlark.com/yuque/__puml/6c077f780a37e331527fa22071e8d874.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcImNvbnRyb2xsZXJcIiBhcyBjb250cm9sbGVyXG5wYXJ0aWNpcGFudCBcIlJQQyBDbGllbnRcIiBhcyBjbGllbnRcbnBhcnRpY2lwYW50IFwiUlBDIFNlcnZlclwiIGFzIHNlcnZlclxucGFydGljaXBhbnQgXCJSUEMgU2VydmljZVwiIGFzIHN2Y1xucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxuXG5jbGllbnQgLT4gY2xpZW50OiBNYWtlQ2xpZW50XG5ybm90ZSBvdmVyIGNsaWVudFxuTWFrZUNsaWVudFxu5Yib5bu6dGNw6L-e5o6l5rGgXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiAgc2VydmVyOiBNYWtlU2VydmVyXG5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbk1ha2VTZXJ2ZXJcbuWIm-W7unNlcnZpY2VOYW1l5ZKMc2VydmljZeaYoOWwhOihqFxuZW5kcm5vdGVcblxuc3ZjIC0-IHN2YzogTWFrZVNlcnZpY2VcbnJub3RlIG92ZXIgc3ZjXG5NYWtlU2VydmljZVxu5Yib5bu6bWV0aG9kTmFtZeWSjG1ldGhvZOaYoOWwhOihqFxuZW5kcm5vdGVcblxuc2VydmVyIC0-IHN2YzogcmVnaXN0ZXJcbnJub3RlIG92ZXIgc3ZjXG7lsIZzZXJ2aWNl5re75Yqg5Yiwc2VydmVy56uv55qEbWFw5LitXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiBzZXJ2ZXI6IEFjY2VwdFxcbuebkeWQrOerr-WPo1xuYWN0aXZhdGUgc2VydmVyXG5cblxuXG5jb250cm9sbGVyIC0-IGNsaWVudDog6LCD55SoY2xpZW50LmNhbGwg5Y-R6LW3cnBj6LCD55SoXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5hY3RpdmF0ZSBjbGllbnRcblxucm5vdGUgb3ZlciBjbGllbnRcbmVuY29kZVxuZW5kcm5vdGVcblxuY2xpZW50IC0-IHNlcnZlcjogdGNwIGNvbm5lY3QgLi4uLi5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbmRlY29kZVxuZW5kcm5vdGVcblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEc2VydmljZU5hbWVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBzdmM6IOmAieaLqXNlcnZpY2VcbmFjdGl2YXRlIHN2Y1xucm5vdGUgb3ZlciBzdmNcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEbWV0aG9kTmFtZVxuZW5kcm5vdGVcblxuc3ZjIC0-IHNlcnZpY2U6IOWPjeWwhOiwg-eUqOacrOWcsOaWueazlVxuYWN0aXZhdGUgc2VydmljZVxuc2VydmljZSAtPiBzdmM6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5zdmMgLT4gc2VydmVyOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgc3ZjXG5cbnJub3RlIG92ZXIgc2VydmVyXG5lbmNvZGVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBjbGllbnQ6IHRjcCBjb25uZWN0IC4uLi4uXG5cblxucm5vdGUgb3ZlciBjbGllbnRcbmRlY29kZVxuZW5kcm5vdGVcbmNsaWVudC0-Y29udHJvbGxlcjog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIGNsaWVudFxuZGVhY3RpdmF0ZSBjb250cm9sbGVyXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sLzZjMDc3Zjc4MGEzN2UzMzE1MjdmYTIyMDcxZThkODc0LnN2ZyIsImlkIjoiVkV3QjkiLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)<a name="W5L88"></a>
+![](https://cdn.nlark.com/yuque/__puml/c5d52f992e5fb2d20f04d7bd58e8c11d.svg#lake_card_v2=eyJ0eXBlIjoicHVtbCIsImNvZGUiOiJAc3RhcnR1bWxcblxuYXV0b251bWJlclxuXG5wYXJ0aWNpcGFudCBcImNvbnRyb2xsZXJcIiBhcyBjb250cm9sbGVyXG5wYXJ0aWNpcGFudCBcIlJQQyBDbGllbnRcIiBhcyBjbGllbnRcbnBhcnRpY2lwYW50IFwiUlBDIFNlcnZlclwiIGFzIHNlcnZlclxucGFydGljaXBhbnQgXCJSUEMgU2VydmljZVwiIGFzIHN2Y1xucGFydGljaXBhbnQgXCJzZXJ2aWNlXCIgYXMgc2VydmljZVxuXG5jbGllbnQgLT4gY2xpZW50OiBNYWtlQ2xpZW50XG5ybm90ZSBvdmVyIGNsaWVudFxuTWFrZUNsaWVudFxu5Yib5bu6dGNw6L-e5o6l5rGgXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiAgc2VydmVyOiBNYWtlU2VydmVyXG5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbk1ha2VTZXJ2ZXJcbuWIm-W7unNlcnZpY2VOYW1l5ZKMc2VydmljZeaYoOWwhOihqFxuZW5kcm5vdGVcblxuc3ZjIC0-IHN2YzogTWFrZVNlcnZpY2VcbnJub3RlIG92ZXIgc3ZjXG5NYWtlU2VydmljZVxu5Yib5bu6bWV0aG9kTmFtZeWSjG1ldGhvZOaYoOWwhOihqFxuZW5kcm5vdGVcblxuc2VydmVyIC0-IHN2YzogcmVnaXN0ZXJcbnJub3RlIG92ZXIgc3ZjXG7lsIZzZXJ2aWNl5re75Yqg5Yiwc2VydmVy55qE5pig5bCE6KGo5LitXG5lbmRybm90ZVxuXG5cbnNlcnZlciAtPiBzZXJ2ZXI6IEFjY2VwdFxcbuebkeWQrOerr-WPo1xuYWN0aXZhdGUgc2VydmVyXG5cblxuXG5jb250cm9sbGVyIC0-IGNsaWVudDog6LCD55SoY2xpZW50LmNhbGwg5Y-R6LW3cnBj6LCD55SoXG5hY3RpdmF0ZSBjb250cm9sbGVyXG5hY3RpdmF0ZSBjbGllbnRcblxucm5vdGUgb3ZlciBjbGllbnRcbuW6j-WIl-WMllxuZW5kcm5vdGVcblxuY2xpZW50IC0-IHNlcnZlcjogdGNwIGNvbm5lY3QgLi4uLi5cblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWPjeW6j-WIl-WMllxuZW5kcm5vdGVcblxucm5vdGUgb3ZlciBzZXJ2ZXJcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEc2VydmljZU5hbWVcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBzdmM6IOmAieaLqXNlcnZpY2VcbmFjdGl2YXRlIHN2Y1xucm5vdGUgb3ZlciBzdmNcbuWIpOaWrW1hcOS4reaYr-WQpuWMheWQq1xu6K-35rGC55qEbWV0aG9kTmFtZVxuZW5kcm5vdGVcblxuc3ZjIC0-IHNlcnZpY2U6IOWPjeWwhOiwg-eUqOacrOWcsOaWueazlVxuYWN0aXZhdGUgc2VydmljZVxuc2VydmljZSAtPiBzdmM6IOi_lOWbnue7k-aenFxuZGVhY3RpdmF0ZSBzZXJ2aWNlXG5zdmMgLT4gc2VydmVyOiDov5Tlm57nu5PmnpxcbmRlYWN0aXZhdGUgc3ZjXG5cbnJub3RlIG92ZXIgc2VydmVyXG7luo_liJfljJZcbmVuZHJub3RlXG5cbnNlcnZlciAtPiBjbGllbnQ6IHRjcCBjb25uZWN0IC4uLi4uXG5cblxucm5vdGUgb3ZlciBjbGllbnRcbuWPjeW6j-WIl-WMllxuZW5kcm5vdGVcbmNsaWVudC0-Y29udHJvbGxlcjog6L-U5Zue57uT5p6cXG5kZWFjdGl2YXRlIGNsaWVudFxuZGVhY3RpdmF0ZSBjb250cm9sbGVyXG5cbkBlbmR1bWwiLCJ1cmwiOiJodHRwczovL2Nkbi5ubGFyay5jb20veXVxdWUvX19wdW1sL2M1ZDUyZjk5MmU1ZmIyZDIwZjA0ZDdiZDU4ZThjMTFkLnN2ZyIsImlkIjoiVkV3QjkiLCJtYXJnaW4iOnsidG9wIjp0cnVlLCJib3R0b20iOnRydWV9LCJjYXJkIjoiZGlhZ3JhbSJ9)#### 传输协议
+设置固定字节长度来存放数据长度
 ## 四、接口设计
-<a name="lws9T"></a>
 ### 错误码
 | **err_code** | **err_msg** | **注释** |
 | --- | --- | --- |
@@ -134,37 +119,39 @@
 | 6 | InvalidParamsError | 参数错误 |
 | 7 | success | 成功 |
 
-<a name="pfuyO"></a>
 ### 注册
-**Post  api/entrytask/user/signup**<br />**入参：**
+**Post  api/entrytask/user/signup**
+**入参：**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
-| username | string | 用户名<br />长度限制：[4,13] |
-| password | string | 密码<br />长度限制：[4,13] |
+| username | string | 用户名
+长度限制：[4,13] |
+| password | string | 密码
+长度限制：[4,13] |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data": ""
 }
-// fail
 {
     "errCode":"6",
     "errMsg":"InvalidParamsError",
     "data":""
 }
 ```
-<a name="JyYo5"></a>
 ### 登录
-**Post  api/entrytask/user/signin**<br />**入参**
+**Post  api/entrytask/user/signin**
+**入参**
 
 | **字段名称** | **类型** | **注释** |
 | --- | --- | --- |
-| username | string | 用户名<br />长度限制：[4,13] |
-| password | string | 密码<br />长度限制：[4,13] |
+| username | string | 用户名
+长度限制：[4,13] |
+| password | string | 密码
+长度限制：[4,13] |
 
 **返回值**
 
@@ -173,46 +160,40 @@
 | sessionID | string | 设置在set-cookie中返回 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":""
 }
-// fail
 {
     "errCode":"5",
     "errMsg":"PasswordError",
     "data":""
 }
 ```
-<a name="FJntJ"></a>
 ### 登出
-**GET  api/entrytask/user/signout**<br />**入参**
+**GET  api/entrytask/user/signout**
+**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
 | sessionID | string | 从cookie中获取 |
 
 ```json
-// success
 {
   "errCode":"7",
   "errMsg":"success",
   "data":""
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
     "data":""
 }
 ```
-<a name="GbzKu"></a>
-### <br />
-<a name="hRbLv"></a>
 ### 查看用户信息
-**GET  api/entrytask/user/get_user_info **<br />**入参**
+**GET  api/entrytask/user/get_user_info **
+**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
@@ -227,7 +208,6 @@
 | profilePath | string | 图片路径 |
 
 ```json
-// success
 {
   "errCode":"7",
   "errMsg":"success",
@@ -237,20 +217,20 @@
     "profilePath":"test-2022-08-01.jpg",
   }
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidSessionError",
     "data":""
 }
 ```
-<a name="EvlbF"></a>
 ### 更新头像
-**Post  api/entrytask/user/update_profile_pic**<br />**入参**
+**Post  api/entrytask/user/update_profile_pic**
+**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
-| username | string | 用户名<br />长度限制：[4,13] |
+| username | string | 用户名
+长度限制：[4,13] |
 | profilePic | file | 头像 |
 | sessionID | string | 从cookie中获取 |
 
@@ -261,7 +241,6 @@
 | profilePath | string | 图片路径 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
@@ -269,20 +248,20 @@
         "profilePath":"test-2022-08-01.jpg"
     }
 }
-// fail
 {
     "errCode":"2",
     "errMsg":"InvalidParamsError",
     "data":""
 }
 ```
-<a name="nfsSb"></a>
 ### 更新昵称
-**Post  api/entrytask/user/update_nickname**<br />**入参**
+**Post  api/entrytask/user/update_nickname**
+**入参**
 
 | **字段名称** | **字段类型** | **字段注释** |
 | --- | --- | --- |
-| nickname | string | 更新的昵称<br />长度限制：[1,8] |
+| nickname | string | 更新的昵称
+长度限制：[1,8] |
 | sessionID | string | 从cookie中获取 |
 
 **返回值**
@@ -292,22 +271,18 @@
 | nickname | string | 昵称 |
 
 ```json
-// success
 {
     "errCode":"7",
     "errMsg":"success",
     "data":"xxxxx"
 }
-// fail
 {
     "errCode":"0",
     "errMsg":"ServerError",
     "data":""
 }
 ```
-<a name="DB2p9"></a>
 ## **五、存储设计**
-<a name="RteyI"></a>
 ### MySql
 **user表**
 
@@ -322,9 +297,9 @@
 | salt | char(4) | 生成密码用到的随机值 |
 | profile_path | varchar(128) | 图片存储路径 |
 
-**primary key**: id<br />**unique key**：username
-<a name="sujMW"></a>
-### <br />Redis
+**primary key**: id
+**unique key**：username
+### Redis
 **sessionID和username映射** ：string
 ```
 key：sessionID 
@@ -336,47 +311,56 @@ key：username
 value：[username:xq nickname:xxx profilePath:xxxxxxxxx.jpg]
 ```
 过期时间设置：30分钟
-
-<a name="pDzKc"></a>
 ## **六、外部依赖与限制**
-无
-
-<a name="lS885"></a>
+web Server for Chrome插件：用于在本地电脑启动一个临时文件服务器，进行图片访问
 ## **七、部署方案与环境要求**
 
-
-_<br />
-<a name="l1avW"></a>
+- Golang 版本：1.12.7
+- MySql版本：5.7.10
+- Redis版本：7.0.3
+- MySql 初始用户数据量：
+![截屏2022-08-03 下午2.43.37.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659509084455-c3b6d6d9-c964-496e-8b40-9040d4a3e099.png#clientId=u8a701fd8-f2d7-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=ufba0beb5&margin=%5Bobject%20Object%5D&name=%E6%88%AA%E5%B1%8F2022-08-03%20%E4%B8%8B%E5%8D%882.43.37.png&originHeight=122&originWidth=340&originalType=binary&ratio=1&rotation=0&showTitle=false&size=52322&status=done&style=none&taskId=u5d160efe-761d-4d2f-be0c-0be0ea82f5a&title=)
+### 启动tcpServer
+```shell
+cd /Users/qi.xin/Projects/EntryTask/cmd/tcpServer
+go build tcpServer.go
+./tcpServer
+```
+### 启动httpServer
+```shell
+cd /Users/qi.xin/Projects/EntryTask/cmd/httpServer
+go build httpServer.go
+./httpServer
+```
 ## **八、SLA**
 
 - 200固定用户 qps大于3000    压测结果均值10000左右
 ```shell
-wrk -c200 -t8 -d120s -s benchmark/getUserInfo.lua  -H "Cookie: sessionID=120f6f4a-4e92-44eb-89db-e39bb68e16ea" --latency http://localhost:9090/api/entrytask/user/get_user_info 
+wrk -c200 -t8 -d120s -s benchmark/getUserInfo.lua  -H "Cookie: sessionID=0f9f2699-27ed-34f4-be25-b1de0d024c1f" --latency http://localhost:9090/api/entrytask/user/get_user_info 
 ```
-![固定200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659062099644-3f58f7c7-bfeb-41fc-ad4b-92cd035abbf6.png#clientId=ua583142f-62f6-4&crop=0&crop=0&crop=1&crop=1&from=drop&id=uc741e62c&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A200.png&originHeight=710&originWidth=3322&originalType=binary&ratio=1&rotation=0&showTitle=false&size=173304&status=done&style=none&taskId=u5eab2f6f-ebd7-42d9-8ce2-26efea41044&title=)
+![固定 200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659458763234-2ff09473-6b58-4732-9e91-a6bbfee105f1.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=u086d2221&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A%20200.png&originHeight=760&originWidth=3336&originalType=binary&ratio=1&rotation=0&showTitle=false&size=187098&status=done&style=none&taskId=ucd81811d-f636-4f81-81d9-874aef24439&title=)
 
-- 2000固定用户 qps大于1500    压测结果均值9000左右   
+- 2000固定用户 qps大于1500    压测结果均值7000左右   
 ```shell
-wrk -c2000 -t8 -d60s -s benchmark/getUserInfo.lua -H "Cookie: sessionID=6e87c1c2-a160-4ef4-9e6c-64f8ed459a33"" --latency http://localhost:9090/api/entrytask/user/get_user_info
+wrk -c2000 -t8 -d60s -s benchmark/getUserInfo.lua -H "Cookie: sessionID=a73fd784-c132-3963-84bf-ba586b98a6a9" --latency http://localhost:9090/api/entrytask/user/get_user_info
 ```
-![固定2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659062106812-b399a249-f2e2-47d2-942b-cc8d898eeed1.png#clientId=ua583142f-62f6-4&crop=0&crop=0&crop=1&crop=1&from=drop&id=uddcfd8a8&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A2000.png&originHeight=752&originWidth=3342&originalType=binary&ratio=1&rotation=0&showTitle=false&size=188561&status=done&style=none&taskId=udc65dcaa-60c8-41c0-ab57-b40d4f71886&title=)
+![固定 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659458774991-58f41dfc-f8b7-4e9a-b178-88b671e5ec01.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=u9210e18c&margin=%5Bobject%20Object%5D&name=%E5%9B%BA%E5%AE%9A%202000.png&originHeight=756&originWidth=3304&originalType=binary&ratio=1&rotation=0&showTitle=false&size=184884&status=done&style=none&taskId=u6dcb4255-40c9-4d8c-b525-85b9da68999&title=)
 
-- 200随机用户 qps大于1000    压测结果均值6000左右 
+- 200随机用户 qps大于1000    压测结果均值5000左右 
 ```shell
 wrk -c200 -t8 -d120s -s benchmark/signIn.lua --latency http://localhost:9090/api/entrytask/user/signin
 ```
-![随机200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659062116708-7a593e4f-881e-4738-88f3-09e17bf4faec.png#clientId=ua583142f-62f6-4&crop=0&crop=0&crop=1&crop=1&from=drop&id=ud0eda86e&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA200.png&originHeight=758&originWidth=2218&originalType=binary&ratio=1&rotation=0&showTitle=false&size=159282&status=done&style=none&taskId=u7972e1da-b627-4df5-b9fa-1700d51ea25&title=)
+![随机 200.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659459312854-9b23b2e7-661f-43c2-ba98-8ad0fa9c2770.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=ub89f63c5&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%20200.png&originHeight=748&originWidth=2228&originalType=binary&ratio=1&rotation=0&showTitle=false&size=159573&status=done&style=none&taskId=u9e243e02-fe33-482b-8739-fde253efdc2&title=)
 
-- 2000随机用户 qps大于800    压测结果均值4000左右
+- 2000随机用户 qps大于800    压测结果均值3500左右
 ```shell
 wrk -c2000 -t8 -d120s -s benchmark/signIn.lua --latency http://localhost:9090/api/entrytask/user/signin
 ```
-![随机2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659062123812-fc6b2933-7363-4304-9692-bb60dbc6c5c7.png#clientId=ua583142f-62f6-4&crop=0&crop=0&crop=1&crop=1&from=drop&id=u5336db1c&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA2000.png&originHeight=754&originWidth=2164&originalType=binary&ratio=1&rotation=0&showTitle=false&size=159583&status=done&style=none&taskId=u74133068-2e2c-40eb-b266-f39ea34c6c9&title=)
-<a name="tmhcV"></a>
+![随机 2000.png](https://cdn.nlark.com/yuque/0/2022/png/21719644/1659462183139-f6db1eb7-680c-4fcb-b224-ee59bc2513b2.png#clientId=u3b873f51-20af-4&crop=0&crop=0&crop=1&crop=1&from=ui&id=uf2594552&margin=%5Bobject%20Object%5D&name=%E9%9A%8F%E6%9C%BA%202000.png&originHeight=748&originWidth=2160&originalType=binary&ratio=1&rotation=0&showTitle=false&size=158226&status=done&style=none&taskId=u50188d76-357b-4b80-ab6e-eb3c1ad7f6a&title=)
 ## **九、遗留问题与风险预估**
-rpc超时处理
+接口设计存在冗余，可以简化
+rpc动态代理，超时处理
 
-_<br />
-<a name="AvVRu"></a>
 ## **十、附录**
 无
+
