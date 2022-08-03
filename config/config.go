@@ -14,13 +14,15 @@ const (
 	RedisPoolNum    = 200
 	DialTimeout     = time.Duration(30) * time.Second
 	DialReadTimeout = time.Duration(30) * time.Second
+
 	// 图片保存配置参数
 	FilePath = "img/"
 	LogPath  = "logger/"
 
 	// RPC配置
 	RpcAddr = "127.0.0.1:20000"
-	ConnNum = 2000
+	ConnNum = 1000
+	ConnMax = 1500
 
 	// salt生成字符串
 	Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
