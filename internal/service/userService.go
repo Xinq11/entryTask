@@ -72,7 +72,7 @@ func (u *UserService) SignIn(user entity.UserDTO) (res rpcEntity.RpcResponse) {
 	// 校验用户是否存在
 	userDO, err := mapper.QueryUserInfoByUsername(user.Username)
 	if err != nil {
-		logger.Error("userService.SignUp queryUserInfoByUsername error: " + err.Error())
+		logger.Error("userService.SignIn queryUserInfoByUsername error: " + err.Error())
 		if err == sql.ErrNoRows {
 			return rpcEntity.RpcResponse{
 				ErrCode: constant.UserNotExistError,
@@ -145,6 +145,7 @@ func (u *UserService) GetUserInfo(user entity.UserDTO) (res rpcEntity.RpcRespons
 	username, err := manager.GetSession(user.SessionID)
 	// session不存在 用户未登录或登录过期
 	if err != nil {
+		logger.Error("userService.GetUserInfo GetSession error: " + err.Error())
 		return rpcEntity.RpcResponse{
 			ErrCode: constant.InvalidSessionError,
 		}

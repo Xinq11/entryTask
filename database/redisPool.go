@@ -10,9 +10,11 @@ var RedisDB *redis.Client
 
 func RedisInit() {
 	RedisDB = redis.NewClient(&redis.Options{
-		Addr:     config.RedisAddr,
-		Password: config.RedisPassword,
-		PoolSize: config.RedisPoolNum,
+		Addr:        config.RedisAddr,
+		Password:    config.RedisPassword,
+		PoolSize:    config.RedisPoolNum,
+		DialTimeout: config.DialTimeout,
+		ReadTimeout: config.DialReadTimeout,
 	})
 	_, err := RedisDB.Ping().Result()
 	if err != nil {

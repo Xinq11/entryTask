@@ -18,7 +18,7 @@ function setup(thread)
 end
 wrk.method = "POST"
 wrk.headers["Content-Type"] = "application/json"
-local cnt = 0
+local cnt = 10000
 local num = 0
 function request()
     if num >= 10

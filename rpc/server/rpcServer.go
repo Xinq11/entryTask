@@ -46,10 +46,6 @@ func (server *RpcServer) Accept(addr string) {
 				// 读取数据
 				data, err := network.Read(conn)
 				if err != nil {
-					if err.Error() == "EOF" {
-						conn.Close()
-						break
-					}
 					logger.Error("rpcServer.Accept read error: " + err.Error())
 				}
 				// 解码

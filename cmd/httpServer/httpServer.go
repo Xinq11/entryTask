@@ -24,14 +24,11 @@ func main() {
 	// 初始化日志
 	logger.Init()
 	// 初始化RPC Client
-	err := client.MakeClient(config.RpcAddr)
-	if err != nil {
-		logrus.Panic("HttpServer MakeClient error: ", err.Error())
-	}
+	client.MakeClient(config.RpcAddr)
 	// 启动HTTP Server
 	route()
 	logrus.Infoln("httpserver start...")
-	err = http.ListenAndServe(":9090", nil) // 设置监听的端口
+	err := http.ListenAndServe(":9090", nil) // 设置监听的端口
 	if err != nil {
 		logrus.Panic("HttpServer ListenAndServe error: ", err.Error())
 	}
